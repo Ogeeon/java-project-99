@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:./build/h2/devdb;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
