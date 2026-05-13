@@ -24,18 +24,18 @@ public class User implements BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "User first name is required")
-    @Size(min = 2, max = 50)
     private String firstName;
 
-    @NotBlank(message = "User last name is required")
-    @Size(min = 2, max = 50)
     private String lastName;
 
     @NotBlank(message = "User email is required")
     @Column(unique = true)
     @Email
     private String email;
+
+    @NotBlank
+    @Size(min = 3)
+    private String password;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
