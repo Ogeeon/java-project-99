@@ -1,44 +1,47 @@
 plugins {
-	java
-	id("org.springframework.boot") version "4.0.6"
-	id("io.spring.dependency-management") version "1.1.7"
+    java
+    id("org.springframework.boot") version "4.0.6"
+    id("io.spring.dependency-management") version "1.1.7"
 }
 
 group = "hexlet.code"
 version = "0.0.1-SNAPSHOT"
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter")
-	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("org.springframework.boot:spring-boot-starter-validation")
-	implementation(libs.datafaker)
-	implementation(libs.jackson.databind.nullable)
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation(libs.datafaker)
+    implementation(libs.jackson.databind.nullable)
+    implementation(libs.mapstruct)
 
-	compileOnly("org.projectlombok:lombok")
+    compileOnly("org.projectlombok:lombok")
 
-	annotationProcessor("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
 
-	runtimeOnly("com.h2database:h2")
-	runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("com.h2database:h2")
+    runtimeOnly("org.postgresql:postgresql")
 
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation(libs.json.unit.assertj)
-	testImplementation("com.h2database:h2")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(libs.json.unit.assertj)
+    testImplementation("com.h2database:h2")
 }
 
 tasks.withType<Test> {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }

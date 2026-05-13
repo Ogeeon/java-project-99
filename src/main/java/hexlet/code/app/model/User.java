@@ -28,14 +28,11 @@ public class User implements BaseEntity {
 
     private String lastName;
 
-    @NotBlank(message = "User email is required")
     @Column(unique = true)
     @Email
     private String email;
 
-    @NotBlank
-    @Size(min = 3)
-    private String password;
+    private String passwordDigest;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
