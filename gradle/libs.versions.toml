@@ -1,0 +1,9 @@
+[versions]
+datafaker = "2.4.3"
+jackson-databind-nullable = "0.2.6"
+json-unit = "4.1.0"
+
+[libraries]
+datafaker = { module = "net.datafaker:datafaker", version.ref = "datafaker" }
+jackson-databind-nullable = { module = "org.openapitools:jackson-databind-nullable", version.ref = "jackson-databind-nullable" }
+json-unit-assertj = { module = "net.javacrumbs.json-unit:json-unit-assertj", version.ref = "json-unit" }

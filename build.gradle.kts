@@ -22,6 +22,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation(libs.datafaker)
+	implementation(libs.jackson.databind.nullable)
 
 	compileOnly("org.projectlombok:lombok")
 
@@ -33,6 +35,7 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation(libs.json.unit.assertj)
 	testImplementation("com.h2database:h2")
 }
 
