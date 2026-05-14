@@ -6,12 +6,11 @@ import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -21,19 +20,20 @@ import java.util.List;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 
 @SpringBootTest
+@AutoConfigureMockMvc
 class UsersControllerTest {
 
     @Autowired
-    private WebApplicationContext context;
+    private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper om;
-
-    private MockMvc mockMvc;
 
     private final Faker faker = new Faker();
 
@@ -45,19 +45,21 @@ class UsersControllerTest {
 
     private User testUser;
 
+    private JwtRequestPostProcessor token;
+
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
         userRepository.deleteAll();
         testUser = new User();
         testUser.setEmail(faker.internet().emailAddress());
         testUser.setPasswordDigest(encoder.encode(faker.internet().password()));
         userRepository.save(testUser);
+        token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
     }
 
     @Test
     void testIndex() throws Exception {
-        var response = mockMvc.perform(get("/api/users"))
+        var response = mockMvc.perform(get("/api/users").with(token))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         var data = response.getContentAsString();
@@ -69,7 +71,7 @@ class UsersControllerTest {
 
     @Test
     void testShow() throws Exception {
-        var response = mockMvc.perform(get("/api/users/" + testUser.getId()))
+        var response = mockMvc.perform(get("/api/users/" + testUser.getId()).with(token))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         var data = response.getContentAsString();
@@ -84,7 +86,7 @@ class UsersControllerTest {
         userMap.put("email", faker.internet().emailAddress());
         userMap.put("password", faker.internet().password());
 
-        var request = post("/api/users").contentType(MediaType.APPLICATION_JSON)
+        var request = post("/api/users").with(token).contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(userMap));
         var result = mockMvc.perform(request).andExpect(status().isCreated()).andReturn();
         String response = result.getResponse().getContentAsString();
@@ -102,7 +104,7 @@ class UsersControllerTest {
         updates.put("firstName", faker.name().firstName());
         updates.put("email", faker.internet().emailAddress());
         updates.put("password", faker.internet().password());
-        mockMvc.perform(put("/api/users/" + testUser.getId())
+        mockMvc.perform(put("/api/users/" + testUser.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(updates)))
                 .andExpect(status().isOk());
@@ -116,7 +118,7 @@ class UsersControllerTest {
         var updates = new HashMap<String, String>();
         updates.put("firstName", faker.name().firstName());
         var oldEmail = testUser.getEmail();
-        mockMvc.perform(patch("/api/users/" + testUser.getId())
+        mockMvc.perform(patch("/api/users/" + testUser.getId()).with(token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(updates)))
                 .andExpect(status().isOk());
@@ -127,7 +129,7 @@ class UsersControllerTest {
 
     @Test
     void testDelete() throws Exception {
-        mockMvc.perform(delete("/api/users/" + testUser.getId()))
+        mockMvc.perform(delete("/api/users/" + testUser.getId()).with(token))
                 .andExpect(status().isNoContent());
         assertThat(userRepository.findById(testUser.getId())).isEmpty();
     }

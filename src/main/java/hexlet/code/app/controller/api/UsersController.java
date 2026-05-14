@@ -7,10 +7,12 @@ import hexlet.code.app.dto.UserPatchDTO;
 import hexlet.code.app.dto.UserUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.mapper.UserMapper;
+import hexlet.code.app.util.UserUtils;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -21,10 +23,12 @@ public class UsersController {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserUtils userUtils;
 
-    public UsersController(UserRepository userRepository, UserMapper userMapper) {
+    public UsersController(UserRepository userRepository, UserMapper userMapper, UserUtils userUtils) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.userUtils = userUtils;
     }
 
     @GetMapping("/{id}")
@@ -54,6 +58,9 @@ public class UsersController {
     public UserDTO update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND.formatted(id)));
+        if (!userUtils.getCurrentUser().getId().equals(id)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
         userMapper.update(dto, user);
         userRepository.save(user);
         return userMapper.map(user);
@@ -64,6 +71,9 @@ public class UsersController {
     public UserDTO partialUpdate(@PathVariable Long id, @Valid @RequestBody UserPatchDTO dto) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND.formatted(id)));
+        if (!userUtils.getCurrentUser().getId().equals(id)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
         userMapper.patch(dto, user);
         userRepository.save(user);
         return userMapper.map(user);
@@ -74,6 +84,9 @@ public class UsersController {
     public void destroy(@PathVariable Long id) {
         userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND.formatted(id)));
+        if (!userUtils.getCurrentUser().getId().equals(id)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
         userRepository.deleteById(id);
     }
 }
