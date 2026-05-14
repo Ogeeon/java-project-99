@@ -4,7 +4,9 @@
       "Bash(jar tf *)",
       "Bash(Get-ChildItem -Path \"d:\\\\Programming\\\\Java\\\\java-project-99\" -Recurse -ErrorAction SilentlyContinue)",
       "Bash(Select-Object -ExpandProperty FullName)",
-      "Bash(./gradlew test *)"
+      "Bash(./gradlew test *)",
+      "Bash(Get-ChildItem -Path \"d:\\\\Programming\\\\Java\\\\java-project-99\\\\src\\\\main\\\\resources\" -Recurse -File)",
+      "Bash(Select-Object FullName)"
     ]
   }
 }

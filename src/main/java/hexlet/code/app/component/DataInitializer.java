@@ -20,9 +20,11 @@ public class DataInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        var userData = new User();
-        userData.setEmail("hexlet@example.com");
-        userData.setPasswordDigest(passwordEncoder.encode("qwerty"));
-        userRepository.save(userData);
+        if (userRepository.findByEmail("hexlet@example.com").isEmpty()) {
+            var userData = new User();
+            userData.setEmail("hexlet@example.com");
+            userData.setPasswordDigest(passwordEncoder.encode("qwerty"));
+            userRepository.save(userData);
+        }
     }
 }
