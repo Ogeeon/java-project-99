@@ -74,6 +74,9 @@ public class UsersController {
         if (!userUtils.getCurrentUser().getId().equals(id)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+        if (dto.getPassword().isPresent() && dto.getPassword().get().length() < 3) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must be at least 3 characters");
+        }
         userMapper.patch(dto, user);
         userRepository.save(user);
         return userMapper.map(user);

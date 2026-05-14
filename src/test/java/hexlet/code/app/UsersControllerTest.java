@@ -118,7 +118,7 @@ class UsersControllerTest {
         var updates = new HashMap<String, String>();
         updates.put("firstName", faker.name().firstName());
         var oldEmail = testUser.getEmail();
-        mockMvc.perform(patch("/api/users/" + testUser.getId()).with(token)
+        mockMvc.perform(put("/api/users/" + testUser.getId()).with(token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(updates)))
                 .andExpect(status().isOk());
