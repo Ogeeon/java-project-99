@@ -1,6 +1,6 @@
 plugins {
     java
-    id("org.springframework.boot") version "4.0.6"
+    id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
 }
 
@@ -31,6 +31,7 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
 
     annotationProcessor("org.projectlombok:lombok")
+    annotationProcessor(libs.mapstruct.processor)
 
     runtimeOnly("com.h2database:h2")
     runtimeOnly("org.postgresql:postgresql")
