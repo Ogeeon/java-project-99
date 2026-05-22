@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Entity
-@ToString(includeFieldNames = true, onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "taskstatuses")
 public class TaskStatus implements BaseEntity {
