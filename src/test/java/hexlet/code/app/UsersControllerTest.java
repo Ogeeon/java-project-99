@@ -1,6 +1,7 @@
 package hexlet.code.app;
 
 import hexlet.code.app.model.User;
+import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.UserRepository;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.ActiveProfiles;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -27,6 +29,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class UsersControllerTest {
 
     @Autowired
@@ -37,6 +40,9 @@ class UsersControllerTest {
 
     private final Faker faker = new Faker();
 
+    @Autowired
+    private TaskRepository taskRepository;
+    
     @Autowired
     private UserRepository userRepository;
 
@@ -49,7 +55,9 @@ class UsersControllerTest {
 
     @BeforeEach
     void setUp() {
+        taskRepository.deleteAll();
         userRepository.deleteAll();
+        
         testUser = new User();
         testUser.setEmail(faker.internet().emailAddress());
         testUser.setPasswordDigest(encoder.encode(faker.internet().password()));
@@ -59,6 +67,12 @@ class UsersControllerTest {
 
     @Test
     void testIndex() throws Exception {
+        for (int i=0; i<3; i++) {
+            testUser = new User();
+            testUser.setEmail(faker.internet().emailAddress());
+            testUser.setPasswordDigest(encoder.encode(faker.internet().password()));
+            userRepository.save(testUser);
+        }
         var response = mockMvc.perform(get("/api/users").with(token))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();

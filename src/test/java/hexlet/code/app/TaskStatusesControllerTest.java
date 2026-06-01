@@ -49,6 +49,11 @@ class TaskStatusesControllerTest {
 
     @Test
     void testIndex() throws Exception {
+        for (int i = 0; i < 10; i++) {
+            var taskStatus = new TaskStatus();
+            taskStatus.setName("TestStatus" + i);
+            taskStatus.setSlug("test_status" + i);
+        }
         var response = mockMvc.perform(get("/api/task_statuses"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();

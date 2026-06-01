@@ -18,27 +18,33 @@ import java.time.LocalDateTime;
 @Entity
 @ToString(onlyExplicitlyIncluded = true)
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "taskstatuses")
-public class TaskStatus implements BaseEntity {
+@Table(name = "tasks")
+public class Task implements BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ToString.Include
     private Long id;
 
-    @Column(unique = true)
-    @ToString.Include
     @NotBlank
     @Size(min = 1)
-    private String name;
+    @ToString.Include
+    private String title;
 
-    @Column(unique = true)
     @ToString.Include
-    @NotBlank
-    @Size(min = 1)
-    private String slug;
+    private Integer index;
+
+    @ToString.Include
+    private String content;
+
+    @ManyToOne
+    @JoinColumn(name = "status_id")
+    private TaskStatus status;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User assignee;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 }
-

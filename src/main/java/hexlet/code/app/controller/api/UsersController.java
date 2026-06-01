@@ -1,5 +1,6 @@
 package hexlet.code.app.controller.api;
 
+import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.dto.UserCreateDTO;
 import hexlet.code.app.dto.UserDTO;
@@ -25,10 +26,14 @@ public class UsersController {
     private final UserMapper userMapper;
     private final UserUtils userUtils;
 
-    public UsersController(UserRepository userRepository, UserMapper userMapper, UserUtils userUtils) {
+    private final TaskRepository taskRepository;
+
+    public UsersController(UserRepository userRepository, UserMapper userMapper, UserUtils userUtils,
+                           TaskRepository taskRepository) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.userUtils = userUtils;
+        this.taskRepository = taskRepository;
     }
 
     @GetMapping("/{id}")
@@ -49,8 +54,7 @@ public class UsersController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserDTO create(@Valid @RequestBody UserCreateDTO dto) {
         var model = userMapper.map(dto);
-        userRepository.save(model);
-        return userMapper.map(model);
+        return userMapper.map(userRepository.save(model));
     }
 
     @PutMapping("/{id}")
@@ -62,8 +66,7 @@ public class UsersController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         userMapper.update(dto, user);
-        userRepository.save(user);
-        return userMapper.map(user);
+        return userMapper.map(userRepository.save(user));
     }
 
     @PatchMapping("/{id}")
@@ -78,8 +81,7 @@ public class UsersController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must be at least 3 characters");
         }
         userMapper.patch(dto, user);
-        userRepository.save(user);
-        return userMapper.map(user);
+        return userMapper.map(userRepository.save(user));
     }
 
     @DeleteMapping("/{id}")
@@ -89,6 +91,10 @@ public class UsersController {
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND.formatted(id)));
         if (!userUtils.getCurrentUser().getId().equals(id)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        if (taskRepository.existsByAssigneeId(id)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Cannot delete user: they are assigned to existing tasks");
         }
         userRepository.deleteById(id);
     }

@@ -3,11 +3,13 @@ package hexlet.code.app.controller.api;
 import hexlet.code.app.dto.*;
 import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.mapper.TaskStatusMapper;
+import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -20,9 +22,13 @@ public class TaskStatusController {
     private final TaskStatusRepository taskStatusRepository;
     private final TaskStatusMapper taskStatusMapper;
 
-    public TaskStatusController(TaskStatusRepository taskStatusRepository, TaskStatusMapper taskStatusMapper) {
+    private final TaskRepository taskRepository;
+
+    public TaskStatusController(TaskStatusRepository taskStatusRepository, TaskStatusMapper taskStatusMapper,
+                                TaskRepository taskRepository) {
         this.taskStatusRepository = taskStatusRepository;
         this.taskStatusMapper = taskStatusMapper;
+        this.taskRepository = taskRepository;
     }
 
     @GetMapping("/{id}")
@@ -43,8 +49,7 @@ public class TaskStatusController {
     @ResponseStatus(HttpStatus.CREATED)
     public TaskStatusDTO create(@RequestBody TaskStatusCreateDTO dto) {
         var model = taskStatusMapper.map(dto);
-        taskStatusRepository.save(model);
-        return taskStatusMapper.map(model);
+        return taskStatusMapper.map(taskStatusRepository.save(model));
     }
 
     @PutMapping("/{id}")
@@ -63,15 +68,18 @@ public class TaskStatusController {
         var model =  taskStatusRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(STATUS_NOT_FOUND.formatted(id)));
         taskStatusMapper.patch(dto, model);
-        taskStatusRepository.save(model);
-        return taskStatusMapper.map(model);
+        return taskStatusMapper.map(taskStatusRepository.save(model));
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    public void destroy(@PathVariable Long id) {
         taskStatusRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(STATUS_NOT_FOUND.formatted(id)));
+        if (taskRepository.existsByStatusId(id)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Cannot delete task status: it is used by existing tasks");
+        }
         taskStatusRepository.deleteById(id);
     }
 }
