@@ -1,5 +1,6 @@
 package hexlet.code.app.mapper;
 
+import hexlet.code.app.dto.TaskCreateDTO;
 import hexlet.code.app.dto.TaskDTO;
 import hexlet.code.app.dto.TaskPatchDTO;
 import hexlet.code.app.dto.TaskUpdateDTO;
@@ -25,7 +26,7 @@ public abstract class TaskMapper {
 
     @Mapping(source = "status", target = "status", qualifiedByName = "slugToTaskStatus")
     @Mapping(source = "assignee_id", target = "assignee")
-    public abstract Task map(TaskDTO dto);
+    public abstract Task map(TaskCreateDTO dto);
 
     @Mapping(source = "status", target = "status", qualifiedByName = "slugToTaskStatus")
     @Mapping(source = "assignee_id", target = "assignee")

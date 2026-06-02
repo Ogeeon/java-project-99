@@ -5,6 +5,7 @@ import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.mapper.TaskStatusMapper;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,14 +48,14 @@ public class TaskStatusController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public TaskStatusDTO create(@RequestBody TaskStatusCreateDTO dto) {
+    public TaskStatusDTO create(@Valid @RequestBody TaskStatusCreateDTO dto) {
         var model = taskStatusMapper.map(dto);
         return taskStatusMapper.map(taskStatusRepository.save(model));
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public TaskStatusDTO update(@PathVariable Long id, @RequestBody TaskStatusUpdateDTO dto) {
+    public TaskStatusDTO update(@PathVariable Long id, @Valid @RequestBody TaskStatusUpdateDTO dto) {
         var model =  taskStatusRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(STATUS_NOT_FOUND.formatted(id)));
         taskStatusMapper.update(dto, model);
@@ -64,7 +65,7 @@ public class TaskStatusController {
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public TaskStatusDTO partialUpdate(@PathVariable Long id, @RequestBody TaskStatusPatchDTO dto) {
+    public TaskStatusDTO partialUpdate(@PathVariable Long id, @Valid @RequestBody TaskStatusPatchDTO dto) {
         var model =  taskStatusRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(STATUS_NOT_FOUND.formatted(id)));
         taskStatusMapper.patch(dto, model);
