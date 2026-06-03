@@ -40,8 +40,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/index.html").permitAll()
+                        .requestMatchers("/favicon.ico").permitAll()
                         .requestMatchers("/assets/**").permitAll()
                         .requestMatchers("/welcome").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers( HttpMethod.GET,"/api/task_statuses").permitAll()
                         .anyRequest().authenticated())

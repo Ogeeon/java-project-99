@@ -1,7 +1,9 @@
 package hexlet.code.app.component;
 
+import hexlet.code.app.model.Label;
 import hexlet.code.app.model.TaskStatus;
 import hexlet.code.app.model.User;
+import hexlet.code.app.repository.LabelRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
 import hexlet.code.app.repository.UserRepository;
 import org.springframework.boot.ApplicationArguments;
@@ -14,13 +16,16 @@ public class DataInitializer implements ApplicationRunner {
     
     private final UserRepository userRepository;
     private final TaskStatusRepository taskStatusRepository;
+    private final LabelRepository labelRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(UserRepository userRepository,
                            TaskStatusRepository taskStatusRepository,
+                           LabelRepository labelRepository,
                            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.taskStatusRepository = taskStatusRepository;
+        this.labelRepository = labelRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -61,6 +66,16 @@ public class DataInitializer implements ApplicationRunner {
             taskStatusData.setName("Published");
             taskStatusData.setSlug("published");
             taskStatusRepository.save(taskStatusData);
+        }
+        if (labelRepository.findByName("feature").isEmpty()) {
+            var label = new Label();
+            label.setName("feature");
+            labelRepository.save(label);
+        }
+        if (labelRepository.findByName("bug").isEmpty()) {
+            var label = new Label();
+            label.setName("bug");
+            labelRepository.save(label);
         }
     }
 }

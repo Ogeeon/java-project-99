@@ -1,7 +1,10 @@
 package hexlet.code.app;
 
+import hexlet.code.app.model.Task;
+import hexlet.code.app.model.TaskStatus;
 import hexlet.code.app.model.User;
 import hexlet.code.app.repository.TaskRepository;
+import hexlet.code.app.repository.TaskStatusRepository;
 import hexlet.code.app.repository.UserRepository;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,6 +55,9 @@ class UsersControllerTest {
     private User testUser;
 
     private JwtRequestPostProcessor token;
+
+    @Autowired
+    private TaskStatusRepository taskStatusRepository;
 
     @BeforeEach
     void setUp() {
@@ -146,5 +152,24 @@ class UsersControllerTest {
         mockMvc.perform(delete("/api/users/" + testUser.getId()).with(token))
                 .andExpect(status().isNoContent());
         assertThat(userRepository.findById(testUser.getId())).isEmpty();
+    }
+
+    @Test
+    void testDeleteWithAssignedTask() throws Exception {
+        var draftStatus = taskStatusRepository.findBySlug("draft").orElseGet(() -> {
+            var data = new TaskStatus();
+            data.setName("Draft");
+            data.setSlug("draft");
+            taskStatusRepository.save(data);
+            return data;
+        });
+        var testTask = new Task();
+        testTask.setIndex(1);
+        testTask.setTitle("Test Task");
+        testTask.setStatus(draftStatus);
+        testTask.setAssignee(testUser);
+        taskRepository.save(testTask);
+        mockMvc.perform(delete("/api/users/" + testUser.getId()).with(token))
+                .andExpect(status().isConflict());
     }
 }

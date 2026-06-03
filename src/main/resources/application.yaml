@@ -14,6 +14,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 rsa:
   private-key: classpath:certs/private.pem
   public-key: classpath:certs/public.pem

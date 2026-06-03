@@ -1,16 +1,21 @@
 package hexlet.code.app.mapper;
 
 import hexlet.code.app.dto.TaskCreateDTO;
-import hexlet.code.app.dto.TaskDTO;
+import hexlet.code.app.dto.TaskResponseDTO;
 import hexlet.code.app.dto.TaskPatchDTO;
 import hexlet.code.app.dto.TaskUpdateDTO;
+import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
 import hexlet.code.app.repository.TaskStatusRepository;
 import org.mapstruct.*;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Mapper(uses = {JsonNullableMapper.class, ReferenceMapper.class},
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
@@ -19,26 +24,60 @@ import org.springframework.web.server.ResponseStatusException;
 public abstract class TaskMapper {
     @Autowired
     private TaskStatusRepository taskStatusRepository;
+
+    @Autowired
+    private ReferenceMapper referenceMapper;
     
     @Mapping(source = "status.slug", target = "status")
-    @Mapping(source = "assignee.id", target = "assignee_id")
-    public abstract TaskDTO map(Task model);
+    @Mapping(source = "assignee.id", target = "assigneeId")
+    @Mapping(source = "labels", target = "taskLabelIds", qualifiedByName = "labelsToLabelIds")
+    public abstract TaskResponseDTO map(Task model);
 
     @Mapping(source = "status", target = "status", qualifiedByName = "slugToTaskStatus")
-    @Mapping(source = "assignee_id", target = "assignee")
+    @Mapping(source = "assigneeId", target = "assignee")
+    @Mapping(source = "taskLabelIds", target = "labels", qualifiedByName = "mapLabels")
     public abstract Task map(TaskCreateDTO dto);
 
     @Mapping(source = "status", target = "status", qualifiedByName = "slugToTaskStatus")
-    @Mapping(source = "assignee_id", target = "assignee")
+    @Mapping(source = "assigneeId", target = "assignee")
+    @Mapping(source = "taskLabelIds", target = "labels", qualifiedByName = "mapLabels")
     public abstract void update(TaskUpdateDTO update, @MappingTarget Task destination);
 
     @Mapping(source = "status", target = "status", qualifiedByName = "slugToTaskStatus")
-    @Mapping(source = "assignee_id", target = "assignee")
+    @Mapping(source = "assigneeId", target = "assignee")
+    @Mapping(source = "taskLabelIds", target = "labels", qualifiedByName = "mapJsonNullableLabels")
     public abstract void patch(TaskPatchDTO patch, @MappingTarget Task destination);
 
     @Named("slugToTaskStatus")
     public TaskStatus slugToTaskStatus(String slug) {
         return taskStatusRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "TaskStatus not found: " + slug));
-     }
+    }
+
+    @Named("mapJsonNullableLabels")
+    public List<Label> mapJsonNullableLabels(JsonNullable<List<Long>> labelIds) {
+        if (labelIds == null || !labelIds.isPresent()) {
+            return new ArrayList<>();
+        }
+        return referenceMapper.toEntities(labelIds.get(), Label.class);
+    }
+
+    @Named("mapLabels")
+    public List<Label> mapLabels(List<Long> labelIds) {
+        if (labelIds == null) {
+            return new ArrayList<>();
+        }
+        return referenceMapper.toEntities(labelIds, Label.class);
+    }
+
+    @Named("labelsToLabelIds")
+    public List<Long> labelsToLabelIds(List<Label> labels) {
+        if (labels == null) {
+            return List.of();
+        }
+
+        return labels.stream()
+                .map(Label::getId)
+                .toList();
+    }
 }

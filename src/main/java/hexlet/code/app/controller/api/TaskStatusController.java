@@ -19,10 +19,8 @@ import java.util.List;
 @RequestMapping("/api/task_statuses")
 public class TaskStatusController {
     private static final String STATUS_NOT_FOUND = "Task status with id %d not found";
-
     private final TaskStatusRepository taskStatusRepository;
     private final TaskStatusMapper taskStatusMapper;
-
     private final TaskRepository taskRepository;
 
     public TaskStatusController(TaskStatusRepository taskStatusRepository, TaskStatusMapper taskStatusMapper,
@@ -34,28 +32,28 @@ public class TaskStatusController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public TaskStatusDTO show(@PathVariable Long id) {
+    public TaskStatusResponseDTO show(@PathVariable Long id) {
         var status = taskStatusRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(STATUS_NOT_FOUND.formatted(id)));
         return taskStatusMapper.map(status);
     }
 
     @GetMapping("")
-    public ResponseEntity<List<TaskStatusDTO>> index() {
+    public ResponseEntity<List<TaskStatusResponseDTO>> index() {
         var data = taskStatusRepository.findAll().stream().map(taskStatusMapper::map).toList();
         return ResponseEntity.ok().header("X-Total-Count", String.valueOf(data.size())).body(data);
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public TaskStatusDTO create(@Valid @RequestBody TaskStatusCreateDTO dto) {
+    public TaskStatusResponseDTO create(@Valid @RequestBody TaskStatusCreateDTO dto) {
         var model = taskStatusMapper.map(dto);
         return taskStatusMapper.map(taskStatusRepository.save(model));
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public TaskStatusDTO update(@PathVariable Long id, @Valid @RequestBody TaskStatusUpdateDTO dto) {
+    public TaskStatusResponseDTO update(@PathVariable Long id, @Valid @RequestBody TaskStatusUpdateDTO dto) {
         var model =  taskStatusRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(STATUS_NOT_FOUND.formatted(id)));
         taskStatusMapper.update(dto, model);
@@ -65,7 +63,7 @@ public class TaskStatusController {
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public TaskStatusDTO partialUpdate(@PathVariable Long id, @Valid @RequestBody TaskStatusPatchDTO dto) {
+    public TaskStatusResponseDTO partialUpdate(@PathVariable Long id, @Valid @RequestBody TaskStatusPatchDTO dto) {
         var model =  taskStatusRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(STATUS_NOT_FOUND.formatted(id)));
         taskStatusMapper.patch(dto, model);

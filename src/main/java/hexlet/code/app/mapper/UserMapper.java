@@ -1,7 +1,7 @@
 package hexlet.code.app.mapper;
 
 import hexlet.code.app.dto.UserCreateDTO;
-import hexlet.code.app.dto.UserDTO;
+import hexlet.code.app.dto.UserResponseDTO;
 import hexlet.code.app.dto.UserPatchDTO;
 import hexlet.code.app.dto.UserUpdateDTO;
 import hexlet.code.app.model.User;
@@ -13,7 +13,7 @@ import org.mapstruct.*;
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public abstract class UserMapper {
 
-    public abstract UserDTO map(User model);
+    public abstract UserResponseDTO map(User model);
 
     @Mapping(target = "passwordDigest", source = "password", qualifiedByName = "encodePassword")
     public abstract User map(UserCreateDTO model);

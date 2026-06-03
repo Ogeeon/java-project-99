@@ -1,9 +1,9 @@
 package hexlet.code.app.controller.api;
 
+import hexlet.code.app.dto.UserResponseDTO;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.dto.UserCreateDTO;
-import hexlet.code.app.dto.UserDTO;
 import hexlet.code.app.dto.UserPatchDTO;
 import hexlet.code.app.dto.UserUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundException;
@@ -38,28 +38,28 @@ public class UsersController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDTO show(@PathVariable Long id) {
+    public UserResponseDTO show(@PathVariable Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND.formatted(id)));
         return userMapper.map(user);
     }
 
     @GetMapping("")
-    public ResponseEntity<List<UserDTO>> index() {
+    public ResponseEntity<List<UserResponseDTO>> index() {
         var data = userRepository.findAll().stream().map(userMapper::map).toList();
         return ResponseEntity.ok().header("X-Total-Count", String.valueOf(data.size())).body(data);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDTO create(@Valid @RequestBody UserCreateDTO dto) {
+    public UserResponseDTO create(@Valid @RequestBody UserCreateDTO dto) {
         var model = userMapper.map(dto);
         return userMapper.map(userRepository.save(model));
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDTO update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
+    public UserResponseDTO update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND.formatted(id)));
         if (!userUtils.getCurrentUser().getId().equals(id)) {
@@ -71,7 +71,7 @@ public class UsersController {
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDTO partialUpdate(@PathVariable Long id, @Valid @RequestBody UserPatchDTO dto) {
+    public UserResponseDTO partialUpdate(@PathVariable Long id, @Valid @RequestBody UserPatchDTO dto) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND.formatted(id)));
         if (!userUtils.getCurrentUser().getId().equals(id)) {

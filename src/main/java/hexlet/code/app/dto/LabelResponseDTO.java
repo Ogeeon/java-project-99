@@ -7,11 +7,10 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
-@Setter
 @Getter
-public class TaskStatusDTO {
+@Setter
+public class LabelResponseDTO {
     private Long id;
     private String name;
-    private String slug;
     private LocalDateTime createdAt;
 }

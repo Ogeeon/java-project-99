@@ -2,7 +2,9 @@ package hexlet.code.app;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
+import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,8 +40,12 @@ class TaskStatusesControllerTest {
 
     private TaskStatus testStatus;
 
+    @Autowired
+    private TaskRepository taskRepository;
+
     @BeforeEach
     void setUp() {
+        taskRepository.deleteAll();
         taskStatusRepository.deleteAll();
         testStatus = new TaskStatus();
         testStatus.setName("TestStatus");
@@ -110,7 +116,7 @@ class TaskStatusesControllerTest {
         var statusMap = new HashMap<String, String>();
         statusMap.put("name", "NewStatus");
         var storedSlug = taskStatusRepository.findById(testStatus.getId()).orElseThrow().getSlug();
-        mockMvc.perform(put("/api/task_statuses/" + testStatus.getId())
+        mockMvc.perform(patch("/api/task_statuses/" + testStatus.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(statusMap)))
                 .andExpect(status().isOk());
@@ -124,5 +130,16 @@ class TaskStatusesControllerTest {
         mockMvc.perform(delete("/api/task_statuses/" + testStatus.getId()))
                 .andExpect(status().isNoContent());
         assertThat(taskStatusRepository.findById(testStatus.getId())).isEmpty();
+    }
+
+    @Test
+    void testDeleteWithAssignedTask() throws Exception {
+        var testTask = new Task();
+        testTask.setIndex(1);
+        testTask.setTitle("Test Task");
+        testTask.setStatus(testStatus);
+        taskRepository.save(testTask);
+        mockMvc.perform(delete("/api/task_statuses/" + testStatus.getId()))
+                .andExpect(status().isConflict());
     }
 }

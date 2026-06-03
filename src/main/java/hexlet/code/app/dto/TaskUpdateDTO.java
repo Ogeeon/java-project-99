@@ -6,13 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @NoArgsConstructor
 @Setter
 @Getter
 public class TaskUpdateDTO {
     private Integer index;
 
-    private Long assignee_id;
+    private Long assigneeId;
 
     @NotBlank
     @Size(min = 1)
@@ -22,4 +24,6 @@ public class TaskUpdateDTO {
 
     @NotBlank
     private String status;
+
+    private List<Long> taskLabelIds;
 }

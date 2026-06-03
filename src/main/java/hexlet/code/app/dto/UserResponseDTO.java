@@ -9,12 +9,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Setter
 @Getter
-public class TaskDTO {
+public class UserResponseDTO {
     private Long id;
-    private Integer index;
+    private String email;
+    private String firstName;
+    private String lastName;
     private LocalDateTime createdAt;
-    private Long assignee_id;
-    private String title;
-    private String content;
-    private String status;
 }
+

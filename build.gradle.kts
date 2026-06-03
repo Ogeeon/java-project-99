@@ -27,6 +27,7 @@ dependencies {
     implementation(libs.datafaker)
     implementation(libs.jackson.databind.nullable)
     implementation(libs.mapstruct)
+    implementation(libs.springdoc)
 
     compileOnly("org.projectlombok:lombok")
 

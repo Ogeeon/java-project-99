@@ -109,7 +109,7 @@ class TasksControllerTest {
         assertThatJson(data).and(v -> v.node("title").isEqualTo(testTask.getTitle()),
                 v -> v.node("index").isEqualTo(testTask.getIndex()),
                 v -> v.node("status").isEqualTo(testTask.getStatus().getSlug()),
-                v -> v.node("assignee_id").isEqualTo(testUser.getId()));
+                v -> v.node("assigneeId").isEqualTo(testUser.getId()));
     }
 
     @Test
@@ -118,7 +118,7 @@ class TasksControllerTest {
         taskMap.put("title", faker.lorem().word());
         taskMap.put("content", String.join(" ", faker.lorem().words(3)));
         taskMap.put("status", draftStatus.getSlug());
-        taskMap.put("assignee_id", testUser.getId());
+        taskMap.put("assigneeId", testUser.getId());
 
         var request = post("/api/tasks").contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(taskMap));
@@ -138,6 +138,7 @@ class TasksControllerTest {
         var updates = new HashMap<String, String>();
         updates.put("title", faker.lorem().word());
         updates.put("content", String.join(" ", faker.lorem().words(3)));
+        updates.put("status", draftStatus.getSlug());
         mockMvc.perform(put("/api/tasks/" + testTask.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(updates)))
