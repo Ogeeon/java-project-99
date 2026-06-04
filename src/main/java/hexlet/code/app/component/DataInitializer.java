@@ -6,28 +6,20 @@ import hexlet.code.app.model.User;
 import hexlet.code.app.repository.LabelRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
 import hexlet.code.app.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class DataInitializer implements ApplicationRunner {
-    
+
     private final UserRepository userRepository;
     private final TaskStatusRepository taskStatusRepository;
     private final LabelRepository labelRepository;
     private final PasswordEncoder passwordEncoder;
-
-    public DataInitializer(UserRepository userRepository,
-                           TaskStatusRepository taskStatusRepository,
-                           LabelRepository labelRepository,
-                           PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.taskStatusRepository = taskStatusRepository;
-        this.labelRepository = labelRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Override
     public void run(ApplicationArguments args) {

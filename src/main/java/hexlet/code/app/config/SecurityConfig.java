@@ -1,6 +1,7 @@
 package hexlet.code.app.config;
 
 import hexlet.code.app.service.CustomUserDetailsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,18 +20,13 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtDecoder jwtDecoder;
 
     private final PasswordEncoder passwordEncoder;
 
     private final CustomUserDetailsService userService;
-
-    public SecurityConfig(JwtDecoder jwtDecoder, PasswordEncoder passwordEncoder, CustomUserDetailsService userService) {
-        this.jwtDecoder = jwtDecoder;
-        this.passwordEncoder = passwordEncoder;
-        this.userService = userService;
-    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

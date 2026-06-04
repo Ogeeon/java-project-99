@@ -6,6 +6,7 @@ import hexlet.code.app.mapper.TaskStatusMapper;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,18 +18,12 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/api/task_statuses")
+@RequiredArgsConstructor
 public class TaskStatusController {
     private static final String STATUS_NOT_FOUND = "Task status with id %d not found";
     private final TaskStatusRepository taskStatusRepository;
     private final TaskStatusMapper taskStatusMapper;
     private final TaskRepository taskRepository;
-
-    public TaskStatusController(TaskStatusRepository taskStatusRepository, TaskStatusMapper taskStatusMapper,
-                                TaskRepository taskRepository) {
-        this.taskStatusRepository = taskStatusRepository;
-        this.taskStatusMapper = taskStatusMapper;
-        this.taskRepository = taskRepository;
-    }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)

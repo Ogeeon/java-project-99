@@ -10,6 +10,7 @@ import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.util.UserUtils;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UsersController {
     private static final String USER_NOT_FOUND = "User with id %d not found";
 
@@ -27,14 +29,6 @@ public class UsersController {
     private final UserUtils userUtils;
 
     private final TaskRepository taskRepository;
-
-    public UsersController(UserRepository userRepository, UserMapper userMapper, UserUtils userUtils,
-                           TaskRepository taskRepository) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-        this.userUtils = userUtils;
-        this.taskRepository = taskRepository;
-    }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)

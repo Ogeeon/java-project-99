@@ -1,18 +1,15 @@
 package hexlet.code.app.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.mapstruct.Named;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class PasswordEncoderMapper {
 
-    private final org.springframework.security.crypto.password.PasswordEncoder encoder;
-
-    public PasswordEncoderMapper(PasswordEncoder encoder) {
-        this.encoder = encoder;
-    }
+    private final PasswordEncoder encoder;
 
     @Named("encodePassword")
     public String encode(String password) {
