@@ -39,3 +39,4 @@ out/
 CLAUDE.md
 /AGENTS.md
 /amplicode.xml
+/.claude/settings.local.json

@@ -194,56 +194,57 @@ class TasksControllerTest {
         testUser2.setPasswordDigest("1");
         userRepository.save(testUser2);
 
-        var task = new Task();
-        task.setIndex(2);
-        task.setTitle("Example");
-        task.setStatus(reviewStatus);
-        task.setAssignee(testUser);
-        task.setLabels(List.of(l1));
-        taskRepository.save(task);
+        var taskA = new Task();
+        taskA.setIndex(2);
+        taskA.setTitle("Example");
+        taskA.setStatus(reviewStatus);
+        taskA.setAssignee(testUser);
+        taskA.setLabels(List.of(l1));
+        taskRepository.save(taskA);
 
-        task = new Task();
-        task.setIndex(3);
-        task.setTitle("Sample");
-        task.setStatus(reviewStatus);
-        task.setAssignee(testUser2);
-        task.setLabels(List.of(l1, l2));
-        taskRepository.save(task);
+        var taskB = new Task();
+        taskB.setIndex(3);
+        taskB.setTitle("Sample");
+        taskB.setStatus(reviewStatus);
+        taskB.setAssignee(testUser2);
+        taskB.setLabels(List.of(l1, l2));
+        taskRepository.save(taskB);
 
         var response = mockMvc.perform(get("/api/tasks?titleCont=amp"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
-        var data = om.readValue(response.getContentAsString(), new TypeReference<List<Object>>(){});
-        assertThat(data).hasSize(2);
         assertThat(response.getHeader("X-Total-Count")).isEqualTo("2");
+        assertThatJson(response.getContentAsString()).inPath("$[*].title").isArray()
+                .containsExactlyInAnyOrder("Example", "Sample");
 
         response = mockMvc.perform(get("/api/tasks?status=" + reviewStatus.getSlug()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
-        data = om.readValue(response.getContentAsString(), new TypeReference<>(){});
-        assertThat(data).hasSize(2);
         assertThat(response.getHeader("X-Total-Count")).isEqualTo("2");
+        assertThatJson(response.getContentAsString()).inPath("$[*].title").isArray()
+                .containsExactlyInAnyOrder("Example", "Sample");
 
         response = mockMvc.perform(get("/api/tasks?assigneeId=" + testUser.getId()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
-        data = om.readValue(response.getContentAsString(), new TypeReference<>(){});
-        assertThat(data).hasSize(2);
         assertThat(response.getHeader("X-Total-Count")).isEqualTo("2");
+        assertThatJson(response.getContentAsString()).inPath("$[*].title").isArray()
+                .containsExactlyInAnyOrder("Test Task", "Example");
 
         response = mockMvc.perform(get("/api/tasks?labelId=" + l1.getId()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
-        data = om.readValue(response.getContentAsString(), new TypeReference<>() {});
-        assertThat(data).hasSize(2);
         assertThat(response.getHeader("X-Total-Count")).isEqualTo("2");
+        assertThatJson(response.getContentAsString()).inPath("$[*].title").isArray()
+                .containsExactlyInAnyOrder("Example", "Sample");
 
         response = mockMvc.perform(get("/api/tasks?status=" + reviewStatus.getSlug()
                     + "&assigneeId=" + testUser2.getId()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
-        data = om.readValue(response.getContentAsString(), new TypeReference<>(){});
-        assertThat(data).hasSize(1);
         assertThat(response.getHeader("X-Total-Count")).isEqualTo("1");
+        assertThatJson(response.getContentAsString()).and(
+                v -> v.node("[0].title").isEqualTo("Sample"),
+                v -> v.node("[0].assigneeId").isEqualTo(testUser2.getId()));
     }
 }
