@@ -2,9 +2,11 @@ package hexlet.code.app;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
 import hexlet.code.app.model.User;
+import hexlet.code.app.repository.LabelRepository;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
 import hexlet.code.app.repository.UserRepository;
@@ -56,6 +58,9 @@ class TasksControllerTest {
     private TaskStatus draftStatus;
 
     private User testUser;
+
+    @Autowired
+    private LabelRepository labelRepository;
 
     @BeforeEach
     void SetUp() {
@@ -167,5 +172,78 @@ class TasksControllerTest {
         mockMvc.perform(delete("/api/tasks/" + testTask.getId()))
                 .andExpect(status().isNoContent());
         assertThat(taskRepository.findById(testTask.getId())).isEmpty();
+    }
+
+    @Test
+    void testFilters() throws Exception {
+        var reviewStatus = taskStatusRepository.findBySlug("to_review").orElseGet(() -> {
+            var data = new TaskStatus();
+            data.setName("To review");
+            data.setSlug("to_review");
+            taskStatusRepository.save(data);
+            return data;
+        });
+        var l1 = new Label();
+        l1.setName("Test label " + 1);
+        labelRepository.save(l1);
+        var l2 = new Label();
+        l2.setName("Test label " + 2);
+        labelRepository.save(l2);
+        var testUser2 = new User();
+        testUser2.setEmail(faker.internet().emailAddress());
+        testUser2.setPasswordDigest("1");
+        userRepository.save(testUser2);
+
+        var task = new Task();
+        task.setIndex(2);
+        task.setTitle("Example");
+        task.setStatus(reviewStatus);
+        task.setAssignee(testUser);
+        task.setLabels(List.of(l1));
+        taskRepository.save(task);
+
+        task = new Task();
+        task.setIndex(3);
+        task.setTitle("Sample");
+        task.setStatus(reviewStatus);
+        task.setAssignee(testUser2);
+        task.setLabels(List.of(l1, l2));
+        taskRepository.save(task);
+
+        var response = mockMvc.perform(get("/api/tasks?titleCont=amp"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+        var data = om.readValue(response.getContentAsString(), new TypeReference<List<Object>>(){});
+        assertThat(data).hasSize(2);
+        assertThat(response.getHeader("X-Total-Count")).isEqualTo("2");
+
+        response = mockMvc.perform(get("/api/tasks?status=" + reviewStatus.getSlug()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+        data = om.readValue(response.getContentAsString(), new TypeReference<>(){});
+        assertThat(data).hasSize(2);
+        assertThat(response.getHeader("X-Total-Count")).isEqualTo("2");
+
+        response = mockMvc.perform(get("/api/tasks?assigneeId=" + testUser.getId()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+        data = om.readValue(response.getContentAsString(), new TypeReference<>(){});
+        assertThat(data).hasSize(2);
+        assertThat(response.getHeader("X-Total-Count")).isEqualTo("2");
+
+        response = mockMvc.perform(get("/api/tasks?labelId=" + l1.getId()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+        data = om.readValue(response.getContentAsString(), new TypeReference<>() {});
+        assertThat(data).hasSize(2);
+        assertThat(response.getHeader("X-Total-Count")).isEqualTo("2");
+
+        response = mockMvc.perform(get("/api/tasks?status=" + reviewStatus.getSlug()
+                    + "&assigneeId=" + testUser2.getId()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+        data = om.readValue(response.getContentAsString(), new TypeReference<>(){});
+        assertThat(data).hasSize(1);
+        assertThat(response.getHeader("X-Total-Count")).isEqualTo("1");
     }
 }

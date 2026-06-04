@@ -1,13 +1,11 @@
 package hexlet.code.app.controller.api;
 
-import hexlet.code.app.dto.TaskCreateDTO;
-import hexlet.code.app.dto.TaskResponseDTO;
-import hexlet.code.app.dto.TaskPatchDTO;
-import hexlet.code.app.dto.TaskUpdateDTO;
+import hexlet.code.app.dto.*;
 import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.mapper.TaskMapper;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.UserRepository;
+import hexlet.code.app.specification.TaskSpecification;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +25,8 @@ public class TaskController {
 
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
-
     private final UserRepository userRepository;
+    private final TaskSpecification specBuilder;
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -39,8 +37,9 @@ public class TaskController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<TaskResponseDTO>> index() {
-        var data = taskRepository.findAll().stream().map(taskMapper::map).toList();
+    public ResponseEntity<List<TaskResponseDTO>> index(TaskParamsDTO params) {
+        var spec = specBuilder.build(params);
+        var data = taskRepository.findAll(spec).stream().map(taskMapper::map).toList();
         return ResponseEntity.ok().header("X-Total-Count", String.valueOf(data.size())).body(data);
     }
 
