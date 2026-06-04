@@ -22,12 +22,20 @@ import java.util.List;
         componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public abstract class TaskMapper {
-    @Autowired
     private TaskStatusRepository taskStatusRepository;
 
-    @Autowired
     private ReferenceMapper referenceMapper;
-    
+
+    @Autowired
+    protected void setTaskStatusRepository(TaskStatusRepository taskStatusRepository) {
+        this.taskStatusRepository = taskStatusRepository;
+    }
+
+    @Autowired
+    protected void setReferenceMapper(ReferenceMapper referenceMapper) {
+        this.referenceMapper = referenceMapper;
+    }
+
     @Mapping(source = "status.slug", target = "status")
     @Mapping(source = "assignee.id", target = "assigneeId")
     @Mapping(source = "labels", target = "taskLabelIds", qualifiedByName = "labelsToLabelIds")
