@@ -40,3 +40,4 @@ CLAUDE.md
 /AGENTS.md
 /amplicode.xml
 /.claude/settings.local.json
+/src/main/resources/certs/private.pem

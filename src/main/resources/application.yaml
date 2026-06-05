@@ -18,5 +18,5 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 rsa:
-  private-key: classpath:certs/private.pem
+  private-key: ${RSA_PRIVATE_KEY:classpath:certs/private.pem}
   public-key: classpath:certs/public.pem
