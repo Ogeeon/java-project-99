@@ -1,4 +1,4 @@
-package hexlet.code.app;
+package hexlet.code.app.controller.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -66,7 +66,7 @@ class TasksControllerTest {
     void SetUp() {
         taskRepository.deleteAll();
         userRepository.deleteAll();
-        
+
         testUser = new User();
         testUser.setEmail(faker.internet().emailAddress());
         testUser.setPasswordDigest("1");

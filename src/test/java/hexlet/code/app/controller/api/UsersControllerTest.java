@@ -1,4 +1,4 @@
-package hexlet.code.app;
+package hexlet.code.app.controller.api;
 
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
@@ -45,7 +45,7 @@ class UsersControllerTest {
 
     @Autowired
     private TaskRepository taskRepository;
-    
+
     @Autowired
     private UserRepository userRepository;
 
@@ -63,7 +63,7 @@ class UsersControllerTest {
     void setUp() {
         taskRepository.deleteAll();
         userRepository.deleteAll();
-        
+
         testUser = new User();
         testUser.setEmail(faker.internet().emailAddress());
         testUser.setPasswordDigest(encoder.encode(faker.internet().password()));
