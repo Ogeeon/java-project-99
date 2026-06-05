@@ -1,0 +1,33 @@
+# Version control
+.git
+.gitattributes
+.gitignore
+.github
+
+# Build artifacts (rebuilt inside the image)
+build/
+.gradle/
+bin/
+out/
+
+# IDE / tooling
+.idea
+.vscode/
+*.iws
+*.iml
+*.ipr
+.claude
+amplicode.xml
+
+# Secrets / credentials
+**/*.pem
+**/*.key
+**/*.p12
+.env
+**/.env
+
+# Docs / misc
+HELP.md
+README.md
+CLAUDE.md
+AGENTS.md
