@@ -4,17 +4,12 @@ import hexlet.code.app.dto.LabelCreateDTO;
 import hexlet.code.app.dto.LabelResponseDTO;
 import hexlet.code.app.dto.LabelPatchDTO;
 import hexlet.code.app.dto.LabelUpdateDTO;
-import hexlet.code.app.exception.ResourceNotFoundException;
-import hexlet.code.app.mapper.LabelMapper;
-import hexlet.code.app.repository.LabelRepository;
-import hexlet.code.app.repository.TaskRepository;
-import hexlet.code.app.repository.TaskStatusRepository;
+import hexlet.code.app.service.LabelService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -22,62 +17,41 @@ import java.util.List;
 @RequestMapping("/api/labels")
 @RequiredArgsConstructor
 public class LabelController {
-    private static final String LABEL_NOT_FOUND = "Task label with id %d not found";
-
-    private final LabelRepository labelRepository;
-
-    private final LabelMapper labelMapper;
-
-    private final TaskRepository taskRepository;
+    private final LabelService labelService;
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public LabelResponseDTO show(@PathVariable("id") Long id) {
-        var model = labelRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(LABEL_NOT_FOUND.formatted(id)));
-        return labelMapper.map(model);
+        return labelService.findById(id);
     }
 
     @GetMapping("")
     public ResponseEntity<List<LabelResponseDTO>> index() {
-        var data = labelRepository.findAll().stream().map(labelMapper::map).toList();
+        var data = labelService.getAll();
         return ResponseEntity.ok().header("X-Total-Count", String.valueOf(data.size())).body(data);
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public LabelResponseDTO create(@Valid @RequestBody LabelCreateDTO dto) {
-        var model = labelMapper.map(dto);
-        return labelMapper.map(labelRepository.save(model));
+        return labelService.create(dto);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public LabelResponseDTO update(@PathVariable Long id, @Valid @RequestBody LabelUpdateDTO dto) {
-        var model = labelRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(LABEL_NOT_FOUND.formatted(id)));
-        labelMapper.update(dto, model);
-        return labelMapper.map(labelRepository.save(model));
+        return labelService.update(id, dto);
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public LabelResponseDTO partialUpdate(@PathVariable Long id, @Valid @RequestBody LabelPatchDTO dto) {
-        var model = labelRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(LABEL_NOT_FOUND.formatted(id)));
-        labelMapper.patch(dto, model);
-        return labelMapper.map(labelRepository.save(model));
+        return labelService.partialUpdate(id, dto);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void destroy(@PathVariable Long id) {
-        labelRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(LABEL_NOT_FOUND.formatted(id)));
-        if (taskRepository.existsByLabelsId(id)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Cannot delete label: it is used by existing tasks");
-        }
-        labelRepository.deleteById(id);
+        labelService.delete(id);
     }
 }
