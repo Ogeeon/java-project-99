@@ -7,6 +7,7 @@ import hexlet.code.app.repository.LabelRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
 import hexlet.code.app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,12 +22,18 @@ public class DataInitializer implements ApplicationRunner {
     private final LabelRepository labelRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${data-initializer.admin-email}")
+    private String adminEmail;
+
+    @Value("${data-initializer.admin-password}")
+    private String adminPassword;
+
     @Override
     public void run(ApplicationArguments args) {
-        if (userRepository.findByEmail("hexlet@example.com").isEmpty()) {
+        if (userRepository.findByEmail(adminEmail).isEmpty()) {
             var userData = new User();
-            userData.setEmail("hexlet@example.com");
-            userData.setPasswordDigest(passwordEncoder.encode("qwerty"));
+            userData.setEmail(adminEmail);
+            userData.setPasswordDigest(passwordEncoder.encode(adminPassword));
             userRepository.save(userData);
         }
         if (taskStatusRepository.findBySlug("draft").isEmpty()) {
