@@ -28,8 +28,6 @@ public class LabelController {
 
     private final LabelMapper labelMapper;
 
-    private final TaskStatusRepository taskStatusRepository;
-
     private final TaskRepository taskRepository;
 
     @GetMapping("/{id}")
