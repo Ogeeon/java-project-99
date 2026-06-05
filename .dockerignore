@@ -21,6 +21,7 @@ amplicode.xml
 
 # Secrets / credentials
 **/*.pem
+!**/public.pem
 **/*.key
 **/*.p12
 .env
