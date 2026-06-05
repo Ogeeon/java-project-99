@@ -4,8 +4,8 @@
 
 # Task Manager
 
-A REST API for managing tasks with statuses, labels and assignees. Users authenticate
-with JWT, and every task can be filtered by status, assignee or label.
+An application for managing tasks with statuses, labels and assignees. Users authenticate
+with JWT, and every task can be filtered by title contents, status, assignee or label.
 
 ## Live demo
 Application is deployed on Render: https://java-project-99-y6e3.onrender.com
