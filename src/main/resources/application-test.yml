@@ -6,5 +6,8 @@ spring:
     password:
   jpa:
     hibernate:
-      ddl-auto: create-drop  # схема создается для каждого теста и уничтожается после
+      ddl-auto: create-drop
       show-sql: false
+rsa:
+  private-key: classpath:certs/test_private.pem
+  public-key: classpath:certs/test_public.pem
