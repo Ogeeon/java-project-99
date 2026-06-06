@@ -23,3 +23,6 @@ rsa:
 data-initializer:
   admin-email: ${ADMIN_EMAIL:hexlet@example.com}
   admin-password: ${ADMIN_PASSWORD:qwerty}
+sentry:
+  dsn: https://ba29868b9c5b4e5c92d42787582ee18a@javaprj99avb.bugsink.com/1
+  send-default-pii: true

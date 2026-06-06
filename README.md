@@ -20,8 +20,6 @@ Application is deployed on Render: https://java-project-99-y6e3.onrender.com
 
 ## Run locally
 
-Requirements: **JDK 21**.
-
 ```bash
 ./gradlew bootRun
 ```
@@ -55,7 +53,7 @@ The endpoint returns a JWT. Pass it with every subsequent request:
 Authorization: Bearer <token>
 ```
 
-Main resources:
+Endpoints:
 
 - `/api/users`
 - `/api/task_statuses`
