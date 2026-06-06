@@ -7,8 +7,7 @@ import hexlet.code.app.dto.TaskStatusUpdateDTO;
 import hexlet.code.app.model.TaskStatus;
 import org.mapstruct.*;
 
-@Mapper(uses = {JsonNullableMapper.class},
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+@Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public abstract class TaskStatusMapper {

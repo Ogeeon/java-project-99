@@ -50,7 +50,7 @@ public class UserService {
 
     public UserResponseDTO partialUpdate(Long id, UserPatchDTO dto) {
         var user = getOwnUserOrThrow(id);
-        if (dto.getPassword().isPresent() && dto.getPassword().get().length() < 3) {
+        if (dto.getPassword() != null && dto.getPassword().length() < 3) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must be at least 3 characters");
         }
         userMapper.patch(dto, user);

@@ -1,13 +1,11 @@
 [versions]
 datafaker = "2.4.3"
-jackson-databind-nullable = "0.2.6"
 json-unit = "4.1.0"
 mapstruct = "1.5.5.Final"
-springdoc = "2.8.14"
+springdoc = "3.0.3"
 
 [libraries]
 datafaker = { module = "net.datafaker:datafaker", version.ref = "datafaker" }
-jackson-databind-nullable = { module = "org.openapitools:jackson-databind-nullable", version.ref = "jackson-databind-nullable" }
 json-unit-assertj = { module = "net.javacrumbs.json-unit:json-unit-assertj", version.ref = "json-unit" }
 mapstruct = {module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }

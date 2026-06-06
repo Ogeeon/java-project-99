@@ -1,7 +1,7 @@
 package hexlet.code.app.controller.api;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
@@ -12,10 +12,9 @@ import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -24,12 +23,12 @@ import java.util.List;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@WithMockUser
 @ActiveProfiles("test")
 class LabelsControllerTest {
 
@@ -68,7 +67,7 @@ class LabelsControllerTest {
             l.setName("Test label " + i);
             labelRepository.save(l);
         }
-        var response = mockMvc.perform(get("/api/labels"))
+        var response = mockMvc.perform(get("/api/labels").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         var data = response.getContentAsString();
@@ -80,7 +79,7 @@ class LabelsControllerTest {
 
     @Test
     void tetShow() throws Exception {
-        var response = mockMvc.perform(get("/api/labels/" + testLabel.getId()))
+        var response = mockMvc.perform(get("/api/labels/" + testLabel.getId()).with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         var data = response.getContentAsString();
@@ -92,7 +91,7 @@ class LabelsControllerTest {
     void testCreate() throws Exception {
         var labelMap = new HashMap<String, String>();
         labelMap.put("name", faker.lorem().word());
-        var request = post("/api/labels").contentType(MediaType.APPLICATION_JSON)
+        var request = post("/api/labels").with(jwt()).contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(labelMap));
         var result = mockMvc.perform(request).andExpect(status().isCreated()).andReturn();
         var response = result.getResponse().getContentAsString();
@@ -107,7 +106,7 @@ class LabelsControllerTest {
     void testUpdate() throws Exception {
         var updates = new HashMap<String, String>();
         updates.put("name", faker.lorem().word());
-        mockMvc.perform(put("/api/labels/" + testLabel.getId())
+        mockMvc.perform(put("/api/labels/" + testLabel.getId()).with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(updates)))
                 .andExpect(status().isOk());
@@ -120,7 +119,7 @@ class LabelsControllerTest {
         // This test is added just for the sake of a uniform test structure
         var updates = new HashMap<String, String>();
         updates.put("name", faker.lorem().word());
-        mockMvc.perform(patch("/api/labels/" + testLabel.getId())
+        mockMvc.perform(patch("/api/labels/" + testLabel.getId()).with(jwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(updates)))
                 .andExpect(status().isOk());
@@ -130,7 +129,7 @@ class LabelsControllerTest {
 
     @Test
     void testDestroy() throws Exception {
-        mockMvc.perform(delete("/api/labels/" + testLabel.getId()))
+        mockMvc.perform(delete("/api/labels/" + testLabel.getId()).with(jwt()))
                         .andExpect(status().isNoContent());
         assertThat(labelRepository.findById(testLabel.getId())).isEmpty();
     }
@@ -150,7 +149,7 @@ class LabelsControllerTest {
         testTask.setStatus(draftStatus);
         testTask.setLabels(List.of(testLabel));
         taskRepository.save(testTask);
-        mockMvc.perform(delete("/api/labels/" + testLabel.getId()))
+        mockMvc.perform(delete("/api/labels/" + testLabel.getId()).with(jwt()))
                 .andExpect(status().isConflict());
     }
 }

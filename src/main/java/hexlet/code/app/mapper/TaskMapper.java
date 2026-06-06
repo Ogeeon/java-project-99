@@ -9,7 +9,6 @@ import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
 import hexlet.code.app.repository.TaskStatusRepository;
 import org.mapstruct.*;
-import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,7 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mapper(uses = {JsonNullableMapper.class, ReferenceMapper.class},
+@Mapper(uses = {ReferenceMapper.class},
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
@@ -53,21 +52,13 @@ public abstract class TaskMapper {
 
     @Mapping(source = "status", target = "status", qualifiedByName = "slugToTaskStatus")
     @Mapping(source = "assigneeId", target = "assignee")
-    @Mapping(source = "taskLabelIds", target = "labels", qualifiedByName = "mapJsonNullableLabels")
+    @Mapping(source = "taskLabelIds", target = "labels", qualifiedByName = "mapLabels")
     public abstract void patch(TaskPatchDTO patch, @MappingTarget Task destination);
 
     @Named("slugToTaskStatus")
     public TaskStatus slugToTaskStatus(String slug) {
         return taskStatusRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "TaskStatus not found: " + slug));
-    }
-
-    @Named("mapJsonNullableLabels")
-    public List<Label> mapJsonNullableLabels(JsonNullable<List<Long>> labelIds) {
-        if (labelIds == null || !labelIds.isPresent()) {
-            return new ArrayList<>();
-        }
-        return referenceMapper.toEntities(labelIds.get(), Label.class);
     }
 
     @Named("mapLabels")

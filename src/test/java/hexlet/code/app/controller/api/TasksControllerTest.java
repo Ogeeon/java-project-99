@@ -1,7 +1,7 @@
 package hexlet.code.app.controller.api;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
@@ -14,11 +14,10 @@ import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
@@ -27,12 +26,12 @@ import java.util.List;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@WithMockUser
 @ActiveProfiles("test")
 class TasksControllerTest {
 
@@ -95,7 +94,7 @@ class TasksControllerTest {
             t.setTitle("Test Task" + i);
             taskRepository.save(t);
         }
-        var response = mockMvc.perform(get("/api/tasks"))
+        var response = mockMvc.perform(get("/api/tasks").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         var data = response.getContentAsString();
@@ -107,7 +106,7 @@ class TasksControllerTest {
 
     @Test
     void testShow() throws Exception {
-        var response = mockMvc.perform(get("/api/tasks/" + testTask.getId()))
+        var response = mockMvc.perform(get("/api/tasks/" + testTask.getId()).with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         var data = response.getContentAsString();
@@ -125,7 +124,7 @@ class TasksControllerTest {
         taskMap.put("status", draftStatus.getSlug());
         taskMap.put("assigneeId", testUser.getId());
 
-        var request = post("/api/tasks").contentType(MediaType.APPLICATION_JSON)
+        var request = post("/api/tasks").with(jwt()).contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(taskMap));
         var result = mockMvc.perform(request).andExpect(status().isCreated()).andReturn();
         String response = result.getResponse().getContentAsString();
@@ -144,7 +143,7 @@ class TasksControllerTest {
         updates.put("title", faker.lorem().word());
         updates.put("content", String.join(" ", faker.lorem().words(3)));
         updates.put("status", draftStatus.getSlug());
-        mockMvc.perform(put("/api/tasks/" + testTask.getId())
+        mockMvc.perform(put("/api/tasks/" + testTask.getId()).with(jwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(updates)))
                 .andExpect(status().isOk());
@@ -158,7 +157,7 @@ class TasksControllerTest {
         var updates = new HashMap<String, String>();
         updates.put("title", faker.lorem().word());
         var oldContent = testTask.getContent();
-        mockMvc.perform(patch("/api/tasks/" + testTask.getId())
+        mockMvc.perform(patch("/api/tasks/" + testTask.getId()).with(jwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(updates)))
                 .andExpect(status().isOk());
@@ -169,7 +168,7 @@ class TasksControllerTest {
 
     @Test
     void testDelete() throws Exception {
-        mockMvc.perform(delete("/api/tasks/" + testTask.getId()))
+        mockMvc.perform(delete("/api/tasks/" + testTask.getId()).with(jwt()))
                 .andExpect(status().isNoContent());
         assertThat(taskRepository.findById(testTask.getId())).isEmpty();
     }
@@ -210,28 +209,28 @@ class TasksControllerTest {
         taskB.setLabels(List.of(l1, l2));
         taskRepository.save(taskB);
 
-        var response = mockMvc.perform(get("/api/tasks?titleCont=amp"))
+        var response = mockMvc.perform(get("/api/tasks?titleCont=amp").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         assertThat(response.getHeader("X-Total-Count")).isEqualTo("2");
         assertThatJson(response.getContentAsString()).inPath("$[*].title").isArray()
                 .containsExactlyInAnyOrder("Example", "Sample");
 
-        response = mockMvc.perform(get("/api/tasks?status=" + reviewStatus.getSlug()))
+        response = mockMvc.perform(get("/api/tasks?status=" + reviewStatus.getSlug()).with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         assertThat(response.getHeader("X-Total-Count")).isEqualTo("2");
         assertThatJson(response.getContentAsString()).inPath("$[*].title").isArray()
                 .containsExactlyInAnyOrder("Example", "Sample");
 
-        response = mockMvc.perform(get("/api/tasks?assigneeId=" + testUser.getId()))
+        response = mockMvc.perform(get("/api/tasks?assigneeId=" + testUser.getId()).with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         assertThat(response.getHeader("X-Total-Count")).isEqualTo("2");
         assertThatJson(response.getContentAsString()).inPath("$[*].title").isArray()
                 .containsExactlyInAnyOrder("Test Task", "Example");
 
-        response = mockMvc.perform(get("/api/tasks?labelId=" + l1.getId()))
+        response = mockMvc.perform(get("/api/tasks?labelId=" + l1.getId()).with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         assertThat(response.getHeader("X-Total-Count")).isEqualTo("2");
@@ -239,7 +238,7 @@ class TasksControllerTest {
                 .containsExactlyInAnyOrder("Example", "Sample");
 
         response = mockMvc.perform(get("/api/tasks?status=" + reviewStatus.getSlug()
-                    + "&assigneeId=" + testUser2.getId()))
+                    + "&assigneeId=" + testUser2.getId()).with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         assertThat(response.getHeader("X-Total-Count")).isEqualTo("1");

@@ -52,7 +52,7 @@ public class TaskService {
     }
 
     public TaskResponseDTO partialUpdate(Long id, TaskPatchDTO dto) {
-        validateAssignee(dto.getAssigneeId().orElse(null));
+        validateAssignee(dto.getAssigneeId());
         var task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(TASK_NOT_FOUND.formatted(id)));
         taskMapper.patch(dto, task);

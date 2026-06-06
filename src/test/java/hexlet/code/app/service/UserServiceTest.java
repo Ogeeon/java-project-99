@@ -13,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -87,7 +86,7 @@ class UserServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userUtils.getCurrentUser()).thenReturn(user);
         var dto = new UserPatchDTO();
-        dto.setPassword(JsonNullable.of("ab"));
+        dto.setPassword("ab");
 
         assertThatExceptionOfType(ResponseStatusException.class)
                 .isThrownBy(() -> userService.partialUpdate(1L, dto))
@@ -102,7 +101,7 @@ class UserServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userUtils.getCurrentUser()).thenReturn(user);
         var dto = new UserPatchDTO();
-        dto.setPassword(JsonNullable.of("abc"));
+        dto.setPassword("abc");
 
         userService.partialUpdate(1L, dto);
 

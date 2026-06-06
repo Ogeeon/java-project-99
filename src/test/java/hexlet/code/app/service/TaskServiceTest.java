@@ -14,7 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.openapitools.jackson.nullable.JsonNullable;
 
 import java.util.Optional;
 
@@ -89,7 +88,7 @@ class TaskServiceTest {
     @Test
     void partialUpdateThrowsNotFoundWhenAssigneeMissing() {
         var dto = new TaskPatchDTO();
-        dto.setAssigneeId(JsonNullable.of(99L));
+        dto.setAssigneeId(99L);
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(ResourceNotFoundException.class)

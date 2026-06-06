@@ -1,7 +1,7 @@
 package hexlet.code.app.controller.api;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
 import hexlet.code.app.repository.TaskRepository;
@@ -9,10 +9,9 @@ import hexlet.code.app.repository.TaskStatusRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -22,12 +21,12 @@ import java.util.List;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@WithMockUser
 @ActiveProfiles("test")
 class TaskStatusesControllerTest {
 
@@ -62,7 +61,7 @@ class TaskStatusesControllerTest {
             taskStatus.setName("TestStatus" + i);
             taskStatus.setSlug("test_status" + i);
         }
-        var response = mockMvc.perform(get("/api/task_statuses"))
+        var response = mockMvc.perform(get("/api/task_statuses").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         var data = response.getContentAsString();
@@ -74,7 +73,7 @@ class TaskStatusesControllerTest {
 
     @Test
     void testShow() throws Exception {
-        var response = mockMvc.perform(get("/api/task_statuses/" + testStatus.getId()))
+        var response = mockMvc.perform(get("/api/task_statuses/" + testStatus.getId()).with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         var data = response.getContentAsString();
@@ -87,7 +86,7 @@ class TaskStatusesControllerTest {
         var statusMap = new HashMap<String, String>();
         statusMap.put("name", "NewStatus");
         statusMap.put("slug", "new_status");
-        var response =  mockMvc.perform(post("/api/task_statuses")
+        var response =  mockMvc.perform(post("/api/task_statuses").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(statusMap)))
                 .andExpect(status().isCreated())
@@ -104,7 +103,7 @@ class TaskStatusesControllerTest {
         var statusMap = new HashMap<String, String>();
         statusMap.put("name", "NewStatus");
         statusMap.put("slug", "new_status");
-        mockMvc.perform(put("/api/task_statuses/" + testStatus.getId())
+        mockMvc.perform(put("/api/task_statuses/" + testStatus.getId()).with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(statusMap)))
                 .andExpect(status().isOk());
@@ -118,7 +117,7 @@ class TaskStatusesControllerTest {
         var statusMap = new HashMap<String, String>();
         statusMap.put("name", "NewStatus");
         var storedSlug = taskStatusRepository.findById(testStatus.getId()).orElseThrow().getSlug();
-        mockMvc.perform(patch("/api/task_statuses/" + testStatus.getId())
+        mockMvc.perform(patch("/api/task_statuses/" + testStatus.getId()).with(jwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(statusMap)))
                 .andExpect(status().isOk());
@@ -129,7 +128,7 @@ class TaskStatusesControllerTest {
 
     @Test
     void testDelete() throws Exception {
-        mockMvc.perform(delete("/api/task_statuses/" + testStatus.getId()))
+        mockMvc.perform(delete("/api/task_statuses/" + testStatus.getId()).with(jwt()))
                 .andExpect(status().isNoContent());
         assertThat(taskStatusRepository.findById(testStatus.getId())).isEmpty();
     }
@@ -141,7 +140,7 @@ class TaskStatusesControllerTest {
         testTask.setTitle("Test Task");
         testTask.setStatus(testStatus);
         taskRepository.save(testTask);
-        mockMvc.perform(delete("/api/task_statuses/" + testStatus.getId()))
+        mockMvc.perform(delete("/api/task_statuses/" + testStatus.getId()).with(jwt()))
                 .andExpect(status().isConflict());
     }
 }
