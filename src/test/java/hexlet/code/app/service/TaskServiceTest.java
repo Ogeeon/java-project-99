@@ -39,7 +39,7 @@ class TaskServiceTest {
     private TaskSpecification specBuilder;
 
     @InjectMocks
-    private TaskService taskService;
+    private TaskServiceImpl taskService;
 
     @Test
     void createThrowsNotFoundWhenAssigneeMissing() {

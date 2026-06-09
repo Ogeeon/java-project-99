@@ -37,7 +37,7 @@ class UserServiceTest {
     private TaskRepository taskRepository;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
 
     private static User userWithId(Long id) {
         var user = new User();

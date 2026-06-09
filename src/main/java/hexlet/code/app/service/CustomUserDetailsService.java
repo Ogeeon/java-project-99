@@ -3,6 +3,7 @@ package hexlet.code.app.service;
 import hexlet.code.app.model.User;
 import hexlet.code.app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,6 +11,7 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
 @Service
+@NullMarked
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsManager {
 

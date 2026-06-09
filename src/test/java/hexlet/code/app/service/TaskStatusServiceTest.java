@@ -34,7 +34,7 @@ class TaskStatusServiceTest {
     private TaskRepository taskRepository;
 
     @InjectMocks
-    private TaskStatusService taskStatusService;
+    private TaskStatusServiceImpl taskStatusService;
 
     @Test
     void findByIdThrowsNotFoundWhenMissing() {

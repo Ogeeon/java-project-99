@@ -34,7 +34,7 @@ class LabelServiceTest {
     private TaskRepository taskRepository;
 
     @InjectMocks
-    private LabelService labelService;
+    private LabelServiceImpl labelService;
 
     @Test
     void findByIdThrowsNotFoundWhenMissing() {

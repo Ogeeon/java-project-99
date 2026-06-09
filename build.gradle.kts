@@ -30,6 +30,7 @@ dependencies {
     implementation(libs.springdoc)
 
     compileOnly("org.projectlombok:lombok")
+    compileOnly(libs.jspecify)
 
     annotationProcessor("org.projectlombok:lombok")
     annotationProcessor(libs.mapstruct.processor)
