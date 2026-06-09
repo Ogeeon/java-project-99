@@ -5,7 +5,6 @@ import hexlet.code.app.dto.UserUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.model.User;
-import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,9 +31,6 @@ class UserServiceTest {
 
     @Mock
     private UserMapper userMapper;
-
-    @Mock
-    private TaskRepository taskRepository;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -93,22 +89,9 @@ class UserServiceTest {
     }
 
     @Test
-    void deleteThrowsConflictWhenUserHasTasks() {
+    void deleteRemovesUser() {
         var user = userWithId(1L);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(taskRepository.existsByAssigneeId(1L)).thenReturn(true);
-
-        assertThatExceptionOfType(ResponseStatusException.class)
-                .isThrownBy(() -> userService.delete(1L))
-                .satisfies(ex -> assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.CONFLICT));
-        verify(userRepository, never()).deleteById(1L);
-    }
-
-    @Test
-    void deleteRemovesUserWhenNoTasks() {
-        var user = userWithId(1L);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(taskRepository.existsByAssigneeId(1L)).thenReturn(false);
 
         userService.delete(1L);
 

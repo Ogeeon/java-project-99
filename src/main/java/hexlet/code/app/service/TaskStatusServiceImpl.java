@@ -6,12 +6,9 @@ import hexlet.code.app.dto.TaskStatusResponseDTO;
 import hexlet.code.app.dto.TaskStatusUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.mapper.TaskStatusMapper;
-import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -22,7 +19,6 @@ public class TaskStatusServiceImpl implements TaskStatusService {
 
     private final TaskStatusRepository taskStatusRepository;
     private final TaskStatusMapper taskStatusMapper;
-    private final TaskRepository taskRepository;
 
     @Override
     public List<TaskStatusResponseDTO> getAll() {
@@ -62,10 +58,6 @@ public class TaskStatusServiceImpl implements TaskStatusService {
     public void delete(Long id) {
         taskStatusRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(STATUS_NOT_FOUND.formatted(id)));
-        if (taskRepository.existsByStatusId(id)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Cannot delete task status: it is used by existing tasks");
-        }
         taskStatusRepository.deleteById(id);
     }
 }

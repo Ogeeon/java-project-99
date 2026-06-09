@@ -4,18 +4,14 @@ import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.mapper.LabelMapper;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.repository.LabelRepository;
-import hexlet.code.app.repository.TaskRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -29,9 +25,6 @@ class LabelServiceTest {
 
     @Mock
     private LabelMapper labelMapper;
-
-    @Mock
-    private TaskRepository taskRepository;
 
     @InjectMocks
     private LabelServiceImpl labelService;
@@ -54,20 +47,8 @@ class LabelServiceTest {
     }
 
     @Test
-    void deleteThrowsConflictWhenLabelUsedByTasks() {
+    void deleteRemovesLabel() {
         when(labelRepository.findById(1L)).thenReturn(Optional.of(new Label()));
-        when(taskRepository.existsByLabelsId(1L)).thenReturn(true);
-
-        assertThatExceptionOfType(ResponseStatusException.class)
-                .isThrownBy(() -> labelService.delete(1L))
-                .satisfies(ex -> assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.CONFLICT));
-        verify(labelRepository, never()).deleteById(1L);
-    }
-
-    @Test
-    void deleteRemovesLabelWhenNotUsed() {
-        when(labelRepository.findById(1L)).thenReturn(Optional.of(new Label()));
-        when(taskRepository.existsByLabelsId(1L)).thenReturn(false);
 
         labelService.delete(1L);
 

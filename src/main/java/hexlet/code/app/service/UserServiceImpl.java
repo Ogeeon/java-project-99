@@ -7,7 +7,6 @@ import hexlet.code.app.dto.UserUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.model.User;
-import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +22,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final TaskRepository taskRepository;
 
     @Override
     public List<UserResponseDTO> getAll() {
@@ -63,10 +61,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(Long id) {
         getUserOrThrow(id);
-        if (taskRepository.existsByAssigneeId(id)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Cannot delete user: they are assigned to existing tasks");
-        }
         userRepository.deleteById(id);
     }
 

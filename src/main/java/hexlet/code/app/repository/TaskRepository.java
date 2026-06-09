@@ -8,7 +8,4 @@ import java.util.Optional;
 
 public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
     Optional<Task> findByTitle(String name);
-    boolean existsByStatusId(Long statusId);
-    boolean existsByAssigneeId(Long assigneeId);
-    boolean existsByLabelsId(Long id);
 }
