@@ -134,6 +134,33 @@ class UsersControllerTest {
     }
 
     @Test
+    void testUpdateOtherUserForbidden() throws Exception {
+        var otherUser = new User();
+        otherUser.setEmail(faker.internet().emailAddress());
+        otherUser.setPasswordDigest(encoder.encode(faker.internet().password()));
+        userRepository.save(otherUser);
+
+        var updates = new HashMap<String, String>();
+        updates.put("firstName", faker.name().firstName());
+        mockMvc.perform(put("/api/users/" + otherUser.getId()).with(token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(updates)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void testDeleteOtherUserForbidden() throws Exception {
+        var otherUser = new User();
+        otherUser.setEmail(faker.internet().emailAddress());
+        otherUser.setPasswordDigest(encoder.encode(faker.internet().password()));
+        userRepository.save(otherUser);
+
+        mockMvc.perform(delete("/api/users/" + otherUser.getId()).with(token))
+                .andExpect(status().isForbidden());
+        assertThat(userRepository.findById(otherUser.getId())).isPresent();
+    }
+
+    @Test
     void testPartialUpdate() throws Exception {
         var updates = new HashMap<String, String>();
         updates.put("firstName", faker.name().firstName());

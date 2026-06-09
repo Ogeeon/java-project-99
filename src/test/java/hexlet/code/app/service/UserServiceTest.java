@@ -7,7 +7,6 @@ import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.model.User;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.UserRepository;
-import hexlet.code.app.util.UserUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,9 +34,6 @@ class UserServiceTest {
     private UserMapper userMapper;
 
     @Mock
-    private UserUtils userUtils;
-
-    @Mock
     private TaskRepository taskRepository;
 
     @InjectMocks
@@ -52,28 +48,17 @@ class UserServiceTest {
     @Test
     void updateThrowsNotFoundWhenUserMissing() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        var dto = new UserUpdateDTO();
 
         assertThatExceptionOfType(ResourceNotFoundException.class)
-                .isThrownBy(() -> userService.update(1L, new UserUpdateDTO()));
+                .isThrownBy(() -> userService.update(1L, dto));
         verify(userRepository, never()).save(any());
     }
 
     @Test
-    void updateThrowsForbiddenWhenNotOwnUser() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(userWithId(1L)));
-        when(userUtils.getCurrentUser()).thenReturn(userWithId(2L));
-
-        assertThatExceptionOfType(ResponseStatusException.class)
-                .isThrownBy(() -> userService.update(1L, new UserUpdateDTO()))
-                .satisfies(ex -> assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN));
-        verify(userRepository, never()).save(any());
-    }
-
-    @Test
-    void updateSavesWhenOwnUser() {
+    void updateSaves() {
         var user = userWithId(1L);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userUtils.getCurrentUser()).thenReturn(user);
 
         userService.update(1L, new UserUpdateDTO());
 
@@ -84,7 +69,6 @@ class UserServiceTest {
     void partialUpdateThrowsBadRequestWhenPasswordTooShort() {
         var user = userWithId(1L);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userUtils.getCurrentUser()).thenReturn(user);
         var dto = new UserPatchDTO();
         dto.setPassword("ab");
 
@@ -99,7 +83,6 @@ class UserServiceTest {
     void partialUpdateSavesWhenPasswordValid() {
         var user = userWithId(1L);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userUtils.getCurrentUser()).thenReturn(user);
         var dto = new UserPatchDTO();
         dto.setPassword("abc");
 
@@ -110,21 +93,9 @@ class UserServiceTest {
     }
 
     @Test
-    void deleteThrowsForbiddenWhenNotOwnUser() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(userWithId(1L)));
-        when(userUtils.getCurrentUser()).thenReturn(userWithId(2L));
-
-        assertThatExceptionOfType(ResponseStatusException.class)
-                .isThrownBy(() -> userService.delete(1L))
-                .satisfies(ex -> assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN));
-        verify(userRepository, never()).deleteById(1L);
-    }
-
-    @Test
     void deleteThrowsConflictWhenUserHasTasks() {
         var user = userWithId(1L);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userUtils.getCurrentUser()).thenReturn(user);
         when(taskRepository.existsByAssigneeId(1L)).thenReturn(true);
 
         assertThatExceptionOfType(ResponseStatusException.class)
@@ -134,10 +105,9 @@ class UserServiceTest {
     }
 
     @Test
-    void deleteRemovesUserWhenOwnAndNoTasks() {
+    void deleteRemovesUserWhenNoTasks() {
         var user = userWithId(1L);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userUtils.getCurrentUser()).thenReturn(user);
         when(taskRepository.existsByAssigneeId(1L)).thenReturn(false);
 
         userService.delete(1L);

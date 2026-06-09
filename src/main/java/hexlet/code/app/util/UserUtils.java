@@ -21,4 +21,9 @@ public class UserUtils {
         var email = authentication.getName();
         return userRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("Email not found"));
     }
+
+    public boolean isCurrentUser(Long id) {
+        var currentUser = getCurrentUser();
+        return currentUser != null && currentUser.getId().equals(id);
+    }
 }

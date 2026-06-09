@@ -9,7 +9,6 @@ import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.model.User;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.UserRepository;
-import hexlet.code.app.util.UserUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final UserUtils userUtils;
     private final TaskRepository taskRepository;
 
     public List<UserResponseDTO> getAll() {
@@ -43,13 +41,13 @@ public class UserService {
     }
 
     public UserResponseDTO update(Long id, UserUpdateDTO dto) {
-        var user = getOwnUserOrThrow(id);
+        var user = getUserOrThrow(id);
         userMapper.update(dto, user);
         return userMapper.map(userRepository.save(user));
     }
 
     public UserResponseDTO partialUpdate(Long id, UserPatchDTO dto) {
-        var user = getOwnUserOrThrow(id);
+        var user = getUserOrThrow(id);
         if (dto.getPassword() != null && dto.getPassword().length() < 3) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must be at least 3 characters");
         }
@@ -58,7 +56,7 @@ public class UserService {
     }
 
     public void delete(Long id) {
-        getOwnUserOrThrow(id);
+        getUserOrThrow(id);
         if (taskRepository.existsByAssigneeId(id)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Cannot delete user: they are assigned to existing tasks");
@@ -66,12 +64,8 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    private User getOwnUserOrThrow(Long id) {
-        var user = userRepository.findById(id)
+    private User getUserOrThrow(Long id) {
+        return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND.formatted(id)));
-        if (!userUtils.getCurrentUser().getId().equals(id)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-        return user;
     }
 }
