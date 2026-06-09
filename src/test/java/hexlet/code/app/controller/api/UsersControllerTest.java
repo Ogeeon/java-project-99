@@ -1,5 +1,6 @@
 package hexlet.code.app.controller.api;
 
+import hexlet.code.app.dto.UserResponseDTO;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
 import hexlet.code.app.model.User;
@@ -83,9 +84,11 @@ class UsersControllerTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         var data = response.getContentAsString();
-        var list = om.readValue(data, new TypeReference<List<Object>>() {});
+        var list = om.readValue(data, new TypeReference<List<UserResponseDTO>>() {});
         var stored = userRepository.findAll();
-        assertThat(list).hasSize(stored.size());
+        var actualIds = list.stream().map(UserResponseDTO::getId).toList();
+        var expectedIds = stored.stream().map(User::getId).toList();
+        assertThat(actualIds).containsExactlyInAnyOrderElementsOf(expectedIds);
         assertThat(response.getHeader("X-Total-Count")).isEqualTo(String.valueOf(stored.size()));
     }
 

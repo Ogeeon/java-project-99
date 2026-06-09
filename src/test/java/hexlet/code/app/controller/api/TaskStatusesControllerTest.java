@@ -2,6 +2,7 @@ package hexlet.code.app.controller.api;
 
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
+import hexlet.code.app.dto.TaskStatusResponseDTO;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
 import hexlet.code.app.repository.TaskRepository;
@@ -60,14 +61,17 @@ class TaskStatusesControllerTest {
             var taskStatus = new TaskStatus();
             taskStatus.setName("TestStatus" + i);
             taskStatus.setSlug("test_status" + i);
+            taskStatusRepository.save(taskStatus);
         }
         var response = mockMvc.perform(get("/api/task_statuses").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         var data = response.getContentAsString();
-        var list = om.readValue(data, new TypeReference<List<Object>>(){});
+        var list = om.readValue(data, new TypeReference<List<TaskStatusResponseDTO>>(){});
         var stored = taskStatusRepository.findAll();
-        assertThat(list).hasSize(stored.size());
+        var actualIds = list.stream().map(TaskStatusResponseDTO::getId).toList();
+        var expectedIds = stored.stream().map(TaskStatus::getId).toList();
+        assertThat(actualIds).containsExactlyInAnyOrderElementsOf(expectedIds);
         assertThat(response.getHeader("X-Total-Count")).isEqualTo(String.valueOf(stored.size()));
     }
 

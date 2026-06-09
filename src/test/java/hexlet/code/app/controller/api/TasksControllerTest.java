@@ -2,6 +2,7 @@ package hexlet.code.app.controller.api;
 
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
+import hexlet.code.app.dto.TaskResponseDTO;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
@@ -98,9 +99,11 @@ class TasksControllerTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
         var data = response.getContentAsString();
-        var list = om.readValue(data, new TypeReference<List<Object>>(){});
+        var list = om.readValue(data, new TypeReference<List<TaskResponseDTO>>(){});
         var stored = taskRepository.findAll();
-        assertThat(list).hasSize(stored.size());
+        var actualIds = list.stream().map(TaskResponseDTO::getId).toList();
+        var expectedIds = stored.stream().map(Task::getId).toList();
+        assertThat(actualIds).containsExactlyInAnyOrderElementsOf(expectedIds);
         assertThat(response.getHeader("X-Total-Count")).isEqualTo(String.valueOf(stored.size()));
     }
 
