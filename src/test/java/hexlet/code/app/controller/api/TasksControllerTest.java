@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -89,12 +90,15 @@ class TasksControllerTest {
 
     @Test
     void testIndex() throws Exception {
-        for (int i = 0; i < 10; i++) {
-            var t = new Task();
-            t.setIndex(i);
-            t.setTitle("Test Task" + i);
-            taskRepository.save(t);
-        }
+        var tasks = IntStream.range(0, 10)
+                .mapToObj(i -> {
+                    var t = new Task();
+                    t.setIndex(i);
+                    t.setTitle("Test Task" + i);
+                    return t;
+                })
+                .toList();
+        taskRepository.saveAll(tasks);
         var response = mockMvc.perform(get("/api/tasks").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();

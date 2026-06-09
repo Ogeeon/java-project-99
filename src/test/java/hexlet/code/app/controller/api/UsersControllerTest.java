@@ -22,6 +22,7 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.core.type.TypeReference;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,12 +75,15 @@ class UsersControllerTest {
 
     @Test
     void testIndex() throws Exception {
-        for (int i=0; i<3; i++) {
-            testUser = new User();
-            testUser.setEmail(faker.internet().emailAddress());
-            testUser.setPasswordDigest(encoder.encode(faker.internet().password()));
-            userRepository.save(testUser);
-        }
+        var users = IntStream.range(0, 3)
+                .mapToObj(i -> {
+                    var u = new User();
+                    u.setEmail(faker.internet().emailAddress());
+                    u.setPasswordDigest(encoder.encode(faker.internet().password()));
+                    return u;
+                })
+                .toList();
+        userRepository.saveAll(users);
         var response = mockMvc.perform(get("/api/users").with(token))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();

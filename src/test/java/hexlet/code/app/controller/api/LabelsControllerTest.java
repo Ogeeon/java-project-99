@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,11 +64,14 @@ class LabelsControllerTest {
 
     @Test
     void testIndex() throws Exception {
-        for (int i = 0; i < 5; i++) {
-            var l = new Label();
-            l.setName("Test label " + i);
-            labelRepository.save(l);
-        }
+        var labels = IntStream.range(0, 5)
+                .mapToObj(i -> {
+                    var l = new Label();
+                    l.setName("Test label " + i);
+                    return l;
+                })
+                .toList();
+        labelRepository.saveAll(labels);
         var response = mockMvc.perform(get("/api/labels").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();

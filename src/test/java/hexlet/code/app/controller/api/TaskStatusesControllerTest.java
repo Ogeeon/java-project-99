@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,12 +58,15 @@ class TaskStatusesControllerTest {
 
     @Test
     void testIndex() throws Exception {
-        for (int i = 0; i < 10; i++) {
-            var taskStatus = new TaskStatus();
-            taskStatus.setName("TestStatus" + i);
-            taskStatus.setSlug("test_status" + i);
-            taskStatusRepository.save(taskStatus);
-        }
+        var statuses = IntStream.range(0, 10)
+                .mapToObj(i -> {
+                    var s = new TaskStatus();
+                    s.setName("TestStatus" + i);
+                    s.setSlug("test_status" + i);
+                    return s;
+                })
+                .toList();
+        taskStatusRepository.saveAll(statuses);
         var response = mockMvc.perform(get("/api/task_statuses").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
