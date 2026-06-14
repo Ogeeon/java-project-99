@@ -59,12 +59,14 @@ public abstract class TaskMapper {
 
     @Mapping(source = "status", target = "status", qualifiedByName = "slugToTaskStatus")
     @Mapping(source = "assigneeId", target = "assignee", qualifiedByName = "assigneeIdToUser")
-    @Mapping(source = "taskLabelIds", target = "labels", qualifiedByName = "mapLabels")
+    @Mapping(source = "taskLabelIds", target = "labels",
+            qualifiedByName = "mapLabels", conditionQualifiedByName = "labelsPresent")
     public abstract void update(TaskUpdateDTO update, @MappingTarget Task destination);
 
     @Mapping(source = "status", target = "status", qualifiedByName = "slugToTaskStatus")
     @Mapping(source = "assigneeId", target = "assignee", qualifiedByName = "assigneeIdToUser")
-    @Mapping(source = "taskLabelIds", target = "labels", qualifiedByName = "mapLabels")
+    @Mapping(source = "taskLabelIds", target = "labels",
+            qualifiedByName = "mapLabels", conditionQualifiedByName = "labelsPresent")
     public abstract void patch(TaskPatchDTO patch, @MappingTarget Task destination);
 
     @Named("slugToTaskStatus")
@@ -83,10 +85,16 @@ public abstract class TaskMapper {
                         "User with id %d not found".formatted(assigneeId)));
     }
 
+    @Condition
+    @Named("labelsPresent")
+    public boolean labelsPresent(List<Long> labelIds) {
+        return labelIds != null;
+    }
+
     @Named("mapLabels")
     public Set<Label> mapLabels(List<Long> labelIds) {
         if (labelIds == null || labelIds.isEmpty()) {
-            return Set.of();
+            return new HashSet<>();
         }
         List<Label> labels = labelRepository.findAllById(labelIds);
         if (labels.size() != labelIds.size()) {
