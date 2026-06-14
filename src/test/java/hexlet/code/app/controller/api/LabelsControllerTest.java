@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -154,7 +155,7 @@ class LabelsControllerTest {
         testTask.setIndex(1);
         testTask.setTitle("Test Task");
         testTask.setStatus(draftStatus);
-        testTask.setLabels(List.of(testLabel));
+        testTask.setLabels(Set.of(testLabel));
         taskRepository.save(testTask);
         mockMvc.perform(delete("/api/labels/" + testLabel.getId()).with(jwt()))
                 .andExpect(status().isConflict());

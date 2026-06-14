@@ -1,19 +1,23 @@
 package hexlet.code.app.mapper;
 
 import hexlet.code.app.dto.TaskCreateDTO;
-import hexlet.code.app.dto.TaskResponseDTO;
 import hexlet.code.app.dto.TaskPatchDTO;
+import hexlet.code.app.dto.TaskResponseDTO;
 import hexlet.code.app.dto.TaskUpdateDTO;
+import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
+import hexlet.code.app.repository.LabelRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Mapper(uses = {ReferenceMapper.class},
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
@@ -22,7 +26,8 @@ import java.util.List;
 public abstract class TaskMapper {
     private TaskStatusRepository taskStatusRepository;
 
-    private ReferenceMapper referenceMapper;
+    private LabelRepository labelRepository;
+
 
     @Autowired
     protected void setTaskStatusRepository(TaskStatusRepository taskStatusRepository) {
@@ -30,8 +35,8 @@ public abstract class TaskMapper {
     }
 
     @Autowired
-    protected void setReferenceMapper(ReferenceMapper referenceMapper) {
-        this.referenceMapper = referenceMapper;
+    protected void setLabelRepository(LabelRepository labelRepository) {
+        this.labelRepository = labelRepository;
     }
 
     @Mapping(source = "status.slug", target = "status")
@@ -61,15 +66,19 @@ public abstract class TaskMapper {
     }
 
     @Named("mapLabels")
-    public List<Label> mapLabels(List<Long> labelIds) {
-        if (labelIds == null) {
-            return null;
+    public Set<Label> mapLabels(List<Long> labelIds) {
+        if (labelIds == null || labelIds.isEmpty()) {
+            return Set.of();
         }
-        return referenceMapper.toEntities(labelIds, Label.class);
+        List<Label> labels = labelRepository.findAllById(labelIds);
+        if (labels.size() != labelIds.size()) {
+            throw new ResourceNotFoundException("One or more labels not found: " + labelIds);
+        }
+        return new HashSet<>(labels);
     }
 
     @Named("labelsToLabelIds")
-    public List<Long> labelsToLabelIds(List<Label> labels) {
+    public List<Long> labelsToLabelIds(Set<Label> labels) {
         if (labels == null) {
             return List.of();
         }

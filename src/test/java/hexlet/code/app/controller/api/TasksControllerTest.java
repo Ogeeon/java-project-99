@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -205,7 +206,7 @@ class TasksControllerTest {
         taskA.setTitle("Example");
         taskA.setStatus(reviewStatus);
         taskA.setAssignee(testUser);
-        taskA.setLabels(List.of(l1));
+        taskA.setLabels(Set.of(l1));
         taskRepository.save(taskA);
 
         var taskB = new Task();
@@ -213,7 +214,7 @@ class TasksControllerTest {
         taskB.setTitle("Sample");
         taskB.setStatus(reviewStatus);
         taskB.setAssignee(testUser2);
-        taskB.setLabels(List.of(l1, l2));
+        taskB.setLabels(Set.of(l1, l2));
         taskRepository.save(taskB);
 
         var response = mockMvc.perform(get("/api/tasks?titleCont=amp").with(jwt()))
