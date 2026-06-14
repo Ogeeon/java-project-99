@@ -1,13 +1,10 @@
 package hexlet.code.app.service;
 
-import hexlet.code.app.dto.TaskCreateDTO;
-import hexlet.code.app.dto.TaskPatchDTO;
 import hexlet.code.app.dto.TaskUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.mapper.TaskMapper;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.repository.TaskRepository;
-import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.specification.TaskSpecification;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,47 +30,10 @@ class TaskServiceTest {
     private TaskMapper taskMapper;
 
     @Mock
-    private UserRepository userRepository;
-
-    @Mock
     private TaskSpecification specBuilder;
 
     @InjectMocks
     private TaskServiceImpl taskService;
-
-    @Test
-    void createThrowsNotFoundWhenAssigneeMissing() {
-        var dto = new TaskCreateDTO();
-        dto.setAssigneeId(99L);
-        when(userRepository.findById(99L)).thenReturn(Optional.empty());
-
-        assertThatExceptionOfType(ResourceNotFoundException.class)
-                .isThrownBy(() -> taskService.create(dto));
-        verify(taskRepository, never()).save(any());
-    }
-
-    @Test
-    void createSkipsAssigneeLookupWhenNull() {
-        var dto = new TaskCreateDTO();
-        var task = new Task();
-        when(taskMapper.map(dto)).thenReturn(task);
-
-        taskService.create(dto);
-
-        verify(userRepository, never()).findById(any());
-        verify(taskRepository).save(task);
-    }
-
-    @Test
-    void updateThrowsNotFoundWhenAssigneeMissing() {
-        var dto = new TaskUpdateDTO();
-        dto.setAssigneeId(99L);
-        when(userRepository.findById(99L)).thenReturn(Optional.empty());
-
-        assertThatExceptionOfType(ResourceNotFoundException.class)
-                .isThrownBy(() -> taskService.update(1L, dto));
-        verify(taskRepository, never()).save(any());
-    }
 
     @Test
     void updateThrowsNotFoundWhenTaskMissing() {
@@ -82,17 +42,6 @@ class TaskServiceTest {
 
         assertThatExceptionOfType(ResourceNotFoundException.class)
                 .isThrownBy(() -> taskService.update(1L, dto));
-        verify(taskRepository, never()).save(any());
-    }
-
-    @Test
-    void partialUpdateThrowsNotFoundWhenAssigneeMissing() {
-        var dto = new TaskPatchDTO();
-        dto.setAssigneeId(99L);
-        when(userRepository.findById(99L)).thenReturn(Optional.empty());
-
-        assertThatExceptionOfType(ResourceNotFoundException.class)
-                .isThrownBy(() -> taskService.partialUpdate(1L, dto));
         verify(taskRepository, never()).save(any());
     }
 

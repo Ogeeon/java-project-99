@@ -146,6 +146,29 @@ class TasksControllerTest {
     }
 
     @Test
+    void testCreateWithMissingAssigneeReturnsNotFound() throws Exception {
+        var taskMap = new HashMap<String, Object>();
+        taskMap.put("title", faker.lorem().word());
+        taskMap.put("status", draftStatus.getSlug());
+        taskMap.put("assigneeId", 999999L);
+
+        var request = post("/api/tasks").with(jwt()).contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(taskMap));
+        mockMvc.perform(request).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testUpdateWithMissingAssigneeReturnsNotFound() throws Exception {
+        var updates = new HashMap<String, Object>();
+        updates.put("assigneeId", 999999L);
+
+        mockMvc.perform(put("/api/tasks/" + testTask.getId()).with(jwt())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(updates)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void testUpdate() throws Exception {
         var updates = new HashMap<String, String>();
         updates.put("title", faker.lorem().word());

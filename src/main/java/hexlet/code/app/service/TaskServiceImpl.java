@@ -8,7 +8,6 @@ import hexlet.code.app.dto.TaskUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.mapper.TaskMapper;
 import hexlet.code.app.repository.TaskRepository;
-import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.specification.TaskSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,11 +18,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
     private static final String TASK_NOT_FOUND = "Task with id %d not found";
-    private static final String USER_NOT_FOUND = "User with id %d not found";
 
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
-    private final UserRepository userRepository;
     private final TaskSpecification specBuilder;
 
     @Override
@@ -41,14 +38,12 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskResponseDTO create(TaskCreateDTO dto) {
-        validateAssignee(dto.getAssigneeId());
         var task = taskMapper.map(dto);
         return taskMapper.map(taskRepository.save(task));
     }
 
     @Override
     public TaskResponseDTO update(Long id, TaskUpdateDTO dto) {
-        validateAssignee(dto.getAssigneeId());
         var task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(TASK_NOT_FOUND.formatted(id)));
         taskMapper.update(dto, task);
@@ -57,7 +52,6 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskResponseDTO partialUpdate(Long id, TaskPatchDTO dto) {
-        validateAssignee(dto.getAssigneeId());
         var task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(TASK_NOT_FOUND.formatted(id)));
         taskMapper.patch(dto, task);
@@ -69,11 +63,5 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(TASK_NOT_FOUND.formatted(id)));
         taskRepository.deleteById(id);
-    }
-
-    private void validateAssignee(Long userId) {
-        if (userId != null && userRepository.findById(userId).isEmpty()) {
-            throw new ResourceNotFoundException(USER_NOT_FOUND.formatted(userId));
-        }
     }
 }
