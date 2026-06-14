@@ -1,5 +1,6 @@
 [versions]
 datafaker = "2.4.3"
+instancio = "5.6.0"
 json-unit = "4.1.0"
 jspecify = "1.0.0"
 mapstruct = "1.5.5.Final"
@@ -7,6 +8,7 @@ springdoc = "3.0.3"
 
 [libraries]
 datafaker = { module = "net.datafaker:datafaker", version.ref = "datafaker" }
+instancio-junit = { module = "org.instancio:instancio-junit", version.ref = "instancio" }
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 json-unit-assertj = { module = "net.javacrumbs.json-unit:json-unit-assertj", version.ref = "json-unit" }
 mapstruct = {module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }

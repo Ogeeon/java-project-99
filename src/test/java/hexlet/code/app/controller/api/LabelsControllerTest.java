@@ -10,6 +10,7 @@ import hexlet.code.app.repository.LabelRepository;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
 import net.datafaker.Faker;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.IntStream;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.instancio.Select.field;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -65,13 +66,11 @@ class LabelsControllerTest {
 
     @Test
     void testIndex() throws Exception {
-        var labels = IntStream.range(0, 5)
-                .mapToObj(i -> {
-                    var l = new Label();
-                    l.setName("Test label " + i);
-                    return l;
-                })
-                .toList();
+        var labels = Instancio.ofList(Label.class)
+                .size(5)
+                .ignore(field(Label::getId))
+                .ignore(field(Label::getCreatedAt))
+                .create();
         labelRepository.saveAll(labels);
         var response = mockMvc.perform(get("/api/labels").with(jwt()))
                 .andExpect(status().isOk())

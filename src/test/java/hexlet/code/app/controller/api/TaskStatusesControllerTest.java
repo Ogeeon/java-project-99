@@ -7,6 +7,7 @@ import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.instancio.Select.field;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -58,14 +59,11 @@ class TaskStatusesControllerTest {
 
     @Test
     void testIndex() throws Exception {
-        var statuses = IntStream.range(0, 10)
-                .mapToObj(i -> {
-                    var s = new TaskStatus();
-                    s.setName("TestStatus" + i);
-                    s.setSlug("test_status" + i);
-                    return s;
-                })
-                .toList();
+        var statuses = Instancio.ofList(TaskStatus.class)
+                .size(10)
+                .ignore(field(TaskStatus::getId))
+                .ignore(field(TaskStatus::getCreatedAt))
+                .create();
         taskStatusRepository.saveAll(statuses);
         var response = mockMvc.perform(get("/api/task_statuses").with(jwt()))
                 .andExpect(status().isOk())

@@ -8,6 +8,7 @@ import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
 import hexlet.code.app.repository.UserRepository;
 import net.datafaker.Faker;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,10 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.core.type.TypeReference;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.instancio.Select.field;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -75,14 +76,13 @@ class UsersControllerTest {
 
     @Test
     void testIndex() throws Exception {
-        var users = IntStream.range(0, 3)
-                .mapToObj(i -> {
-                    var u = new User();
-                    u.setEmail(faker.internet().emailAddress());
-                    u.setPasswordDigest(encoder.encode(faker.internet().password()));
-                    return u;
-                })
-                .toList();
+        var users = Instancio.ofList(User.class)
+                .size(3)
+                .ignore(field(User::getId))
+                .ignore(field(User::getCreatedAt))
+                .ignore(field(User::getUpdatedAt))
+                .supply(field(User::getEmail), () -> faker.internet().emailAddress())
+                .create();
         userRepository.saveAll(users);
         var response = mockMvc.perform(get("/api/users").with(token))
                 .andExpect(status().isOk())

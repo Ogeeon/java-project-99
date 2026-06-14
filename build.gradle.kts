@@ -44,6 +44,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-webmvc-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation(libs.json.unit.assertj)
+    testImplementation(libs.instancio.junit)
     testImplementation("com.h2database:h2")
 }
 
