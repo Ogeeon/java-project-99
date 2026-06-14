@@ -25,7 +25,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-    implementation(libs.datafaker)
     implementation(libs.mapstruct)
     implementation(libs.springdoc)
 
@@ -45,6 +44,7 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation(libs.json.unit.assertj)
     testImplementation(libs.instancio.junit)
+    testImplementation(libs.datafaker)
     testImplementation("com.h2database:h2")
 }
 

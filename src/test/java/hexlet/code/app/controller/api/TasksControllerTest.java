@@ -2,6 +2,7 @@ package hexlet.code.app.controller.api;
 
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
+import hexlet.code.app.config.TestConfig;
 import hexlet.code.app.dto.TaskResponseDTO;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Task;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Import(TestConfig.class)
 class TasksControllerTest {
 
     @Autowired
@@ -44,7 +47,8 @@ class TasksControllerTest {
     @Autowired
     private ObjectMapper om;
 
-    private final Faker faker = new Faker();
+    @Autowired
+    private Faker faker;
 
     @Autowired
     private TaskRepository taskRepository;

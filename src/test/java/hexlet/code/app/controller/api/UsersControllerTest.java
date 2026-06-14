@@ -1,5 +1,6 @@
 package hexlet.code.app.controller.api;
 
+import hexlet.code.app.config.TestConfig;
 import hexlet.code.app.dto.UserResponseDTO;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,6 +38,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Import(TestConfig.class)
 class UsersControllerTest {
 
     @Autowired
@@ -44,7 +47,8 @@ class UsersControllerTest {
     @Autowired
     private ObjectMapper om;
 
-    private final Faker faker = new Faker();
+    @Autowired
+    private Faker faker;
 
     @Autowired
     private TaskRepository taskRepository;
