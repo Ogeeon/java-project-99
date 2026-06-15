@@ -3,6 +3,7 @@ package hexlet.code.app.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @ToString(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "taskstatuses")
 public class TaskStatus implements BaseEntity {
@@ -33,6 +35,7 @@ public class TaskStatus implements BaseEntity {
 
     @Column(unique = true)
     @ToString.Include
+    @EqualsAndHashCode.Include
     @NotBlank
     @Size(min = 1)
     private String slug;

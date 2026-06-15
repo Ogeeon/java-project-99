@@ -2,6 +2,7 @@ package hexlet.code.app.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "users")
 public class User implements UserDetails, BaseEntity {
@@ -32,6 +34,7 @@ public class User implements UserDetails, BaseEntity {
 
     @Column(unique = true)
     @Email
+    @EqualsAndHashCode.Include
     private String email;
 
     private String passwordDigest;

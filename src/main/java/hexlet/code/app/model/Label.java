@@ -3,6 +3,7 @@ package hexlet.code.app.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "labels")
 public class Label implements BaseEntity {
@@ -25,6 +27,7 @@ public class Label implements BaseEntity {
     @Column(unique = true)
     @NotBlank
     @Size(min = 1, max = 1000)
+    @EqualsAndHashCode.Include
     private String name;
 
     @CreatedDate
