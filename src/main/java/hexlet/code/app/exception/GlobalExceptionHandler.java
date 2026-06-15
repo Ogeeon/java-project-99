@@ -24,8 +24,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public String handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
-        log.warn("Data integrity violation: {}", ex.getMessage());
-        return "The entity cannot be modified because it is referenced by other records";
+        log.warn("Data integrity violation: {}", ex.getMostSpecificCause().getMessage(), ex);
+        return "Data integrity violation";
     }
 
     @ExceptionHandler(AuthenticationException.class)
