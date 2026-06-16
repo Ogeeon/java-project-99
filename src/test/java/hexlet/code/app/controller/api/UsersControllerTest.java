@@ -145,6 +145,16 @@ class UsersControllerTest {
     }
 
     @Test
+    void testPartialUpdateWithShortPasswordReturnsBadRequest() throws Exception {
+        var updates = new HashMap<String, String>();
+        updates.put("password", "ab");
+        mockMvc.perform(patch("/api/users/" + testUser.getId()).with(token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(updates)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void testUpdateOtherUserForbidden() throws Exception {
         var otherUser = new User();
         otherUser.setEmail(faker.internet().emailAddress());

@@ -11,12 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -59,20 +56,6 @@ class UserServiceTest {
         userService.update(1L, new UserUpdateDTO());
 
         verify(userRepository).save(user);
-    }
-
-    @Test
-    void partialUpdateThrowsBadRequestWhenPasswordTooShort() {
-        var user = userWithId(1L);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        var dto = new UserPatchDTO();
-        dto.setPassword("ab");
-
-        assertThatExceptionOfType(ResponseStatusException.class)
-                .isThrownBy(() -> userService.partialUpdate(1L, dto))
-                .satisfies(ex -> assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST));
-        verify(userMapper, never()).patch(any(), any());
-        verify(userRepository, never()).save(any());
     }
 
     @Test

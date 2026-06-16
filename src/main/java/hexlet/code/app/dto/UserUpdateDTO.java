@@ -1,5 +1,6 @@
 package hexlet.code.app.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,6 +9,7 @@ import lombok.Setter;
 @Getter
 public class UserUpdateDTO {
 
+    @Email
     private String email;
 
     private String firstName;

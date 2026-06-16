@@ -9,9 +9,7 @@ import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.model.User;
 import hexlet.code.app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -51,9 +49,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDTO partialUpdate(Long id, UserPatchDTO dto) {
         var user = getUserOrThrow(id);
-        if (dto.getPassword() != null && dto.getPassword().length() < 3) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must be at least 3 characters");
-        }
         userMapper.patch(dto, user);
         return userMapper.map(userRepository.save(user));
     }
