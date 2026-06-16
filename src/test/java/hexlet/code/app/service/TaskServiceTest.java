@@ -3,7 +3,6 @@ package hexlet.code.app.service;
 import hexlet.code.app.dto.TaskUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.mapper.TaskMapper;
-import hexlet.code.app.model.Task;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.specification.TaskSpecification;
 import org.junit.jupiter.api.Test;
@@ -47,7 +46,7 @@ class TaskServiceTest {
 
     @Test
     void deleteThrowsNotFoundWhenTaskMissing() {
-        when(taskRepository.findById(1L)).thenReturn(Optional.empty());
+        when(taskRepository.existsById(1L)).thenReturn(false);
 
         assertThatExceptionOfType(ResourceNotFoundException.class)
                 .isThrownBy(() -> taskService.delete(1L));
@@ -56,7 +55,7 @@ class TaskServiceTest {
 
     @Test
     void deleteRemovesTaskWhenFound() {
-        when(taskRepository.findById(1L)).thenReturn(Optional.of(new Task()));
+        when(taskRepository.existsById(1L)).thenReturn(true);
 
         taskService.delete(1L);
 

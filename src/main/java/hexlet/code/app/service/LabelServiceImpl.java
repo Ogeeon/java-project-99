@@ -56,8 +56,9 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     public void delete(Long id) {
-        labelRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(LABEL_NOT_FOUND.formatted(id)));
+        if (!labelRepository.existsById(id)) {
+            throw new ResourceNotFoundException(LABEL_NOT_FOUND.formatted(id));
+        }
         labelRepository.deleteById(id);
     }
 }

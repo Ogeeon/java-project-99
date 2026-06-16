@@ -2,7 +2,6 @@ package hexlet.code.app.service;
 
 import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.mapper.LabelMapper;
-import hexlet.code.app.model.Label;
 import hexlet.code.app.repository.LabelRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +38,7 @@ class LabelServiceTest {
 
     @Test
     void deleteThrowsNotFoundWhenMissing() {
-        when(labelRepository.findById(1L)).thenReturn(Optional.empty());
+        when(labelRepository.existsById(1L)).thenReturn(false);
 
         assertThatExceptionOfType(ResourceNotFoundException.class)
                 .isThrownBy(() -> labelService.delete(1L));
@@ -48,7 +47,7 @@ class LabelServiceTest {
 
     @Test
     void deleteRemovesLabel() {
-        when(labelRepository.findById(1L)).thenReturn(Optional.of(new Label()));
+        when(labelRepository.existsById(1L)).thenReturn(true);
 
         labelService.delete(1L);
 

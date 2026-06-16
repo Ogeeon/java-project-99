@@ -56,8 +56,9 @@ public class TaskStatusServiceImpl implements TaskStatusService {
 
     @Override
     public void delete(Long id) {
-        taskStatusRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(STATUS_NOT_FOUND.formatted(id)));
+        if (!taskStatusRepository.existsById(id)) {
+            throw new ResourceNotFoundException(STATUS_NOT_FOUND.formatted(id));
+        }
         taskStatusRepository.deleteById(id);
     }
 }

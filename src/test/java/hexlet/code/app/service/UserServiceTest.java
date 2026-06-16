@@ -73,8 +73,7 @@ class UserServiceTest {
 
     @Test
     void deleteRemovesUser() {
-        var user = userWithId(1L);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.existsById(1L)).thenReturn(true);
 
         userService.delete(1L);
 
