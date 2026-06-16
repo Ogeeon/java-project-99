@@ -150,7 +150,7 @@ class TasksControllerTest {
     }
 
     @Test
-    void testCreateWithMissingAssigneeReturnsNotFound() throws Exception {
+    void testCreateWithMissingAssigneeReturnsBadRequest() throws Exception {
         var taskMap = new HashMap<String, Object>();
         taskMap.put("title", faker.lorem().word());
         taskMap.put("status", draftStatus.getSlug());
@@ -158,18 +158,18 @@ class TasksControllerTest {
 
         var request = post("/api/tasks").with(jwt()).contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(taskMap));
-        mockMvc.perform(request).andExpect(status().isNotFound());
+        mockMvc.perform(request).andExpect(status().isBadRequest());
     }
 
     @Test
-    void testUpdateWithMissingAssigneeReturnsNotFound() throws Exception {
+    void testUpdateWithMissingAssigneeReturnsBadRequest() throws Exception {
         var updates = new HashMap<String, Object>();
         updates.put("assigneeId", 999999L);
 
         mockMvc.perform(put("/api/tasks/" + testTask.getId()).with(jwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(updates)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 
     @Test

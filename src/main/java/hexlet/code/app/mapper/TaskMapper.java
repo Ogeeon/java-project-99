@@ -4,7 +4,6 @@ import hexlet.code.app.dto.TaskCreateDTO;
 import hexlet.code.app.dto.TaskPatchDTO;
 import hexlet.code.app.dto.TaskResponseDTO;
 import hexlet.code.app.dto.TaskUpdateDTO;
-import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
@@ -81,7 +80,7 @@ public abstract class TaskMapper {
             return null;
         }
         return userRepository.findById(assigneeId)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "User with id %d not found".formatted(assigneeId)));
     }
 
@@ -98,7 +97,7 @@ public abstract class TaskMapper {
         }
         List<Label> labels = labelRepository.findAllById(labelIds);
         if (labels.size() != labelIds.size()) {
-            throw new ResourceNotFoundException("One or more labels not found: " + labelIds);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "One or more labels not found: " + labelIds);
         }
         return new HashSet<>(labels);
     }
