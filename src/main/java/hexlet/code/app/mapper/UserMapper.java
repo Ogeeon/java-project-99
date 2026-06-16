@@ -7,7 +7,7 @@ import hexlet.code.app.dto.UserUpdateDTO;
 import hexlet.code.app.model.User;
 import org.mapstruct.*;
 
-@Mapper(uses = {ReferenceMapper.class, PasswordEncoderMapper.class},
+@Mapper(uses = {PasswordEncoderMapper.class},
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
