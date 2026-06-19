@@ -4,6 +4,7 @@ import hexlet.code.app.dto.TaskParamsDTO;
 import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Task;
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,19 @@ public class TaskSpecification {
         return withTitleCont(params.getTitleCont())
                 .and(withAssigneeId(params.getAssigneeId()))
                 .and(withStatus(params.getStatus()))
-                .and(withLabel(params.getLabelId()));
+                .and(withLabel(params.getLabelId()))
+                .and(withRelations());
+    }
+
+    private Specification<Task> withRelations() {
+        return (root, query, cb) -> {
+            Objects.requireNonNull(query, "query must not be null");
+            root.fetch("status", JoinType.LEFT);
+            root.fetch("assignee", JoinType.LEFT);
+            root.fetch("labels", JoinType.LEFT);
+            query.distinct(true);
+            return cb.conjunction();
+        };
     }
 
     private Specification<Task> withTitleCont(String titleCont) {
